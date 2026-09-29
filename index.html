@@ -1,0 +1,2424 @@
+ort React, { useState, useMemo, useEffect, useRef } from "react";
+import { 
+  Sparkles, 
+  ShieldCheck, 
+  Database, 
+  CheckCircle2, 
+  AlertTriangle, 
+  ArrowRight, 
+  RefreshCw, 
+  Compass, 
+  Check, 
+  BookOpen, 
+  Info, 
+  Mail, 
+  HelpCircle, 
+  FileText, 
+  ArrowLeft,
+  X,
+  Plus,
+  Trash2,
+  Lock,
+  Eye,
+  Target,
+  Download,
+  Printer,
+  FileCode,
+  Share2,
+  ExternalLink,
+  ChevronRight,
+  Layers,
+  Search,
+  Scale
+} from "lucide-react";
+
+const DICTIONARY = {
+  id: {
+    appTitle: "Strategic Positioning & Competitive Advantage Mapper",
+    navHome: "Beranda",
+    navAnalyze: "Mulai Pemetaan",
+    navTutorial: "Tutorial",
+    navAbout: "Tentang Kami",
+    navContact: "Kontak",
+    navHelp: "Bantuan & FAQ",
+    heroBadge: "Sistem Pendukung Keputusan Berbasis Riset • Kania Hansdinata & Agung Purnomo",
+    heroTitle: "Ketahui posisi bisnis Anda — dan alasan bisnis Anda layak dipilih.",
+    heroSubtitle: "Bandingkan kompetitor yang relevan, temukan sinyal suara pelanggan, petakan kuadran posisi strategis, dan ciptakan peluang diferensiasi nyata tanpa imitasi buta.",
+    startMapping: "Mulai Pemetaan",
+    seeTutorial: "Lihat Tutorial",
+    trustNote: "AI membantu Anda menganalisis. Keputusan akhir tetap di tangan Anda.",
+    loadDemo: "Muat Contoh Kasus (Syanata Tea)",
+    clearData: "Kosongkan Formulir",
+    evidenceBadge: "Terhubung ke Bukti Nyata",
+    humanInTheLoop: "Kendali Penuh di Tangan Pengusaha",
+    landing: {
+      heroSubtext: "Aplikasi pendukung keputusan berbasis bukti yang dirancang khusus untuk wirausaha perempuan tahap awal dalam memetakan diferensiasi nilai dan keunggulan kompetitif tanpa terjebak perang harga.",
+      primaryCta: "Mulai Pemetaan Strategis",
+      secondaryCta: "Pelajari Panduan & Tutorial",
+      trustDisclaimerTitle: "Prinsip Utama: Human-in-the-Loop & Anti-Fabrikasi Data",
+      trustDisclaimerText: "Sistem ini adalah Decision Support System (DSS), bukan sistem eksekusi otomatis. AI dilarang keras mengarang data keuntungan, omzet rahasia, atau konversi kompetitor. Keputusan akhir tetap 100% di tangan Anda.",
+      pillarsTitle: "Tiga Pilar Analisis Berbasis Bukti",
+      pillarsSubtitle: "Dirancang secara spesifik untuk membebaskan wirausaha perempuan tahap awal dari perang harga dan jebakan meniru kompetitor.",
+      p1Title: "Evidence Before Advice",
+      p1Desc: "Setiap hipotesis strategis terhubung langsung ke rujukan data teramati publik. Sistem tidak menyajikan rekomendasi tanpa bukti dasar yang dapat diperiksa.",
+      p2Title: "Human-in-the-Loop Control",
+      p2Desc: "Sistem bertindak sebagai asisten analitis cerdas. Anda memegang kendali penuh untuk menerima, mengedit, atau menolak setiap opsi diferensiasi.",
+      p3Title: "Diferensiasi Tanpa Imitasi",
+      p3Desc: "Membantu Anda menemukan ceruk pasar autentik berdasarkan keluhan dan kebutuhan riil pelanggan, bukan sekadar menyalin tren kompetitor.",
+      workflowTitle: "Alur Kerja 4 Langkah Terpadu",
+      workflowSubtitle: "Proses terstruktur dari perumusan konteks internal hingga perolehan dokumen rekomendasi resmi.",
+      step1Name: "Profil Bisnis",
+      step1Desc: "Input konteks bisnis internal, rentang harga, saluran, dan dilema strategis.",
+      step2Name: "Set Kompetitor",
+      step2Desc: "Pilih 2–5 kompetitor relevan yang bersaing memperebutkan pelanggan yang sama.",
+      step3Name: "Bukti & Data",
+      step3Desc: "Catat kutipan ulasan riil, menu, atau pengamatan promosi publik teramati.",
+      step4Name: "Peta & Rekomendasi",
+      step4Desc: "Inspeksi kuadran 2D, suara pelanggan, opsi diferensiasi, dan unduh dokumen PDF.",
+      bannerCtaTitle: "Siap Menemukan Keunggulan Kompetitif Bisnis Anda?",
+      bannerCtaSubtitle: "Gunakan data bukti teramati dan formulasi analitis untuk memimpin pasar Anda sekarang."
+    },
+    steps: {
+      profile: "1. Profil Bisnis",
+      competitors: "2. Set Kompetitor",
+      evidence: "3. Catatan Bukti",
+      dashboard: "4. Peta & Rekomendasi"
+    },
+    profileSection: {
+      title: "Profil Bisnis Internal (Konteks Rahasia)",
+      subtitle: "Data kontekstual internal bisnis Anda. Dijaga kerahasiaannya dan tidak dijadikan bukti publik bagi pihak lain.",
+      nameLabel: "Nama Brand / Bisnis *",
+      categoryLabel: "Kategori / Industri *",
+      offersLabel: "Produk & Layanan Utama *",
+      targetLabel: "Target Pelanggan Utama *",
+      locationLabel: "Lokasi & Area Layanan",
+      priceLabel: "Rentang Harga Produk *",
+      channelsLabel: "Saluran Pemasaran & Penjualan *",
+      valuePropLabel: "Proposisi Nilai / Diferensiasi yang Diyakini",
+      attributesLabel: "Gaya Brand & Karakteristik Layanan",
+      strategicQuestionLabel: "Tantangan Strategis Saat Ini",
+      nextBtn: "Lanjut ke Pemilihan Kompetitor"
+    },
+    competitorSection: {
+      title: "Pilih Kompetitor yang Relevan (2–5 Pelaku Usaha)",
+      subtitle: "Hanya bandingkan pelaku usaha yang relevan secara kategori, segmen sasaran, atau substitusi pilihan pelanggan.",
+      emptyWarning: "Pilih minimal 1 kompetitor aktif untuk melanjutkan analisis.",
+      categoryText: "Kategori",
+      priceText: "Rentang Harga",
+      relevanceText: "Alasan Relevansi",
+      addCompetitorBtn: "Tambah Kompetitor Baru",
+      backBtn: "Kembali ke Profil",
+      nextBtn: "Lanjut ke Input Bukti",
+      modalTitle: "Tambah Kompetitor Relevan",
+      namePlaceholder: "Contoh: Kedai Kopi X",
+      categoryPlaceholder: "Contoh: F&B Minuman Cepat Saji",
+      pricePlaceholder: "Rp 15.000 - Rp 30.000",
+      reasonPlaceholder: "Menyasar target pelanggan yang sama...",
+      cancelBtn: "Batal",
+      saveBtn: "Simpan Kompetitor"
+    },
+    evidenceSection: {
+      title: "Pencatatan Bukti Publik (Evidence Records)",
+      subtitle: "Masukkan data teramati publik. AI dilarang keras mengarang data penjualan, laba, atau konversi rahasia.",
+      emptyWarning: "Belum ada bukti data. Tambahkan bukti atau gunakan data contoh.",
+      idText: "Kode Bukti",
+      dimensionText: "Dimensi",
+      sourceText: "Sumber Data",
+      statusText: "Status Verifikasi",
+      dateText: "Tanggal Rekam",
+      runAnalysisBtn: "Jalankan Analisis Gemini Terstruktur",
+      analyzingText: "Menganalisis Bukti Teramati...",
+      backBtn: "Kembali ke Kompetitor",
+      addEvidenceBtn: "Tambah Bukti Baru",
+      modalTitle: "Catat Bukti Publik Teramati",
+      competitorTarget: "Kompetitor Subjek",
+      dimensionSelect: "Dimensi Pengamatan",
+      sourcePlaceholder: "Misal: Ulasan Google Maps tanggal 22 Sep 2026",
+      excerptPlaceholder: "Salin kutipan ulasan riil pelanggan, menu harga, atau pengamatan promosi...",
+      saveEvidenceBtn: "Simpan Catatan Bukti"
+    },
+    dashboardSection: {
+      title: "Hasil Analisis Posisi Strategis & Diferensiasi",
+      confidenceText: "Tingkat Keyakinan Bukti",
+      summaryTitle: "Ringkasan Posisi Strategis Dinamis",
+      quadrantTitle: "Peta Kuadran Posisi 2D (Visual Positioning Matrix)",
+      quadrantSubtitle: "Membandingkan posisi bisnis Anda terhadap kompetitor berbasis bukti teramati",
+      userBrandBadge: "Bisnis Anda",
+      competitorBadge: "Kompetitor Teramati",
+      customerSignalsTitle: "Sinyal Suara Pelanggan (Customer Voice Signals)",
+      customerSignalsSubtitle: "Kebutuhan, keluhan, dan harapan riil yang diekstrak langsung dari bukti teramati",
+      optionsTitle: "Peluang Diferensiasi & Opsi Strategi (Human-in-the-Loop)",
+      optionsSubtitle: "Pilih rekomendasi yang sesuai dengan kapabilitas internal dan prioritas Anda. Keputusan akhir di tangan Anda.",
+      decisionRequiredBadge: "Keputusan Pengguna Diperlukan",
+      applyActionBtn: "Tandai Opsi Ini",
+      appliedActionBtn: "Opsi Dipilih",
+      viewEvidenceBtn: "Lihat Bukti",
+      insufficientEvidence: "Bukti belum cukup",
+      dataGapsTitle: "Kesenjangan Data Teridentifikasi",
+      warningsTitle: "Peringatan Kehati-hatian AI (Anti-Fabrikasi Data)",
+      restartBtn: "Kembali ke Pengaturan Data",
+      downloadTitle: "Ekspor Hasil Analisis",
+      downloadDesc: "Unduh dokumen analisis lengkap dari awal hingga akhir dalam format PDF asli untuk arsip atau presentasi.",
+      btnPdf: "Unduh Dokumen PDF Resmi (.pdf)",
+      generatingPdf: "Menyusun Berkas PDF...",
+      btnPrint: "Cetak Cepat Halaman"
+    },
+    evidenceDrawer: {
+      title: "Pemeriksa Bukti Sumber (Evidence Inspector)",
+      closeBtn: "Tutup",
+      excerptTitle: "Kutipan Bukti Teramati",
+      provenanceTitle: "Asal-usul Sumber & Metadata",
+      channelLabel: "Saluran / Platform:",
+      dateLabel: "Tanggal Rekam:",
+      verificationLabel: "Status Verifikasi:",
+      confidenceLabel: "Tingkat Keyakinan:"
+    },
+    footer: {
+      brandDesc: "Aplikasi pendukung keputusan berbasis riset untuk wirausaha perempuan tahap awal dalam memetakan diferensiasi dan keunggulan kompetitif berbasis bukti.",
+      teamTitle: "Pengembang & Kontak Riset",
+      teamMembers: "Kania Hansdinata & Agung Purnomo",
+      contactEmail: "Email Resmi: kania.hansdinata@binus.ac.id",
+      navTitle: "Navigasi Informasi",
+      legalTitle: "Legal & Kepatuhan",
+      privacyPolicy: "Kebijakan Privasi",
+      termsOfUse: "Syarat & Ketentuan",
+      copyright: "© 2026 Strategic Positioning & Competitive Advantage Mapper. Seluruh hak cipta dilindungi."
+    },
+    aboutPage: {
+      heading: "Tentang Kami (About Us)",
+      lead: "Strategic Positioning & Competitive Advantage Mapper adalah aplikasi web pendukung keputusan yang dikembangkan berbasis riset mendalam untuk membantu wirausaha perempuan tahap awal.",
+      p1: "Banyak wirausaha baru menghadapi tantangan saat menentukan posisi tawar bisnis mereka. Sebagian besar informasi pasar tersebar tidak terstruktur, dan sering kali ada godaan untuk sekadar meniru apa yang sedang populer.",
+      p2: "Produk ini menjunjung tinggi prinsip 'Evidence before advice', menjamin bahwa AI tidak akan pernah mengarang data keuntungan atau penjualan internal kompetitor, serta memastikan kendali keputusan bisnis akhir selalu berada di tangan wirausaha.",
+      founders: "Founder & Tim Pengembang:",
+      contact: "Kontak Korespondensi:"
+    },
+    tutorialPage: {
+      heading: "Panduan Penggunaan Singkat",
+      lead: "Pelajari 4 langkah mudah memetakan posisi pasar dan menemukan celah keunggulan bisnis Anda.",
+      step1Title: "1. Isi Profil Bisnis Internal",
+      step1Desc: "Tuliskan nama brand, penawaran utama, rentang harga, dan tantangan yang sedang Anda hadapi. Data ini dijaga kerahasiaannya.",
+      step2Title: "2. Tentukan Set Kompetitor Relevan",
+      step2Desc: "Pilih 2 hingga 5 kompetitor yang bersaing memperebutkan dompet atau perhatian pelanggan yang sama.",
+      step3Title: "3. Kumpulkan Bukti Teramati",
+      step3Desc: "Catat bukti harga publik, menu, ulasan pelanggan, atau pengamatan promosi secara objektif.",
+      step4Title: "4. Tinjau Peta & Ambil Keputusan",
+      step4Desc: "AI akan memetakan posisi bisnis Anda dalam grafik 2D dan menyajikan opsi diferensiasi berbasis rujukan bukti yang dapat diunduh dalam format PDF."
+    },
+    privacyPage: {
+      heading: "Kebijakan Privasi (Privacy Policy)",
+      intro: "Kami menghormati kerahasiaan data internal wirausaha pengguna aplikasi ini.",
+      point1: "1. Data Profil Internal: Informasi operasional bersifat privat dan tidak akan diekspos sebagai data publik.",
+      point2: "2. Pemrosesan AI Aman: Masukan yang diproses ditransmisikan secara aman dan terenkripsi.",
+      point3: "3. Tanpa Pelacakan Ilegal: Aplikasi menyimpan sesi lokal tanpa penjejakan tidak berizin.",
+      point4: "4. Narahubung Privasi: Pertanyaan dapat dikirimkan ke kania.hansdinata@binus.ac.id."
+    },
+    termsPage: {
+      heading: "Syarat & Ketentuan (Terms of Use)",
+      intro: "Ketentuan penggunaan sistem Strategic Positioning & Competitive Advantage Mapper.",
+      point1: "1. Sistem Pendukung Keputusan: Hasil analisis merupakan hipotesis strategis dan bukan jaminan kesuksesan mutlak.",
+      point2: "2. Tanggung Jawab Eksekusi: Keputusan bisnis sepenuhnya merupakan hak dan tanggung jawab pengguna wirausaha.",
+      point3: "3. Kepatuhan Data Publik: Pengguna dilarang memasukkan materi ilegal atau melanggar hak cipta.",
+      point4: "4. Kontak Resmi: kania.hansdinata@binus.ac.id."
+    },
+    faqPage: {
+      heading: "Pertanyaan Umum (FAQ & Bantuan)",
+      q1: "Apakah AI dapat memprediksi omzet atau keuntungan rahasia kompetitor?",
+      a1: "Tidak. Sesuai prinsip anti-fabrikasi PRD, sistem tidak akan pernah mengarang estimasi laba atau omzet rahasia kompetitor dari sekadar jumlah followers sosial media.",
+      q2: "Bagaimana cara mengekspor hasil analisis ke PDF?",
+      a2: "Pada langkah 4 (Dasbor), klik tombol 'Unduh Dokumen PDF Resmi'. Sistem akan menyusun seluruh dokumen analisis dari Bab 1 hingga Bab 8 secara otomatis.",
+      q3: "Apakah data saya aman jika memuat ulang halaman?",
+      a3: "Sesi aktif tersimpan di penyimpanan browser lokal Anda (Local Storage) untuk kenyamanan analisis."
+    }
+  },
+  en: {
+    appTitle: "Strategic Positioning & Competitive Advantage Mapper",
+    navHome: "Home",
+    navAnalyze: "Start Mapping",
+    navTutorial: "Tutorial",
+    navAbout: "About Us",
+    navContact: "Contact",
+    navHelp: "Help & FAQ",
+    heroBadge: "Research-Informed Decision-Support System • Kania Hansdinata & Agung Purnomo",
+    heroTitle: "Know where your business stands — and why customers choose you.",
+    heroSubtitle: "Compare truly relevant competitors, uncover genuine customer voice signals, map your strategic quadrant, and seize authentic differentiation without blind imitation.",
+    startMapping: "Start Mapping",
+    seeTutorial: "Explore Tutorial",
+    trustNote: "AI assists with empirical analysis. You retain the final strategic decision.",
+    loadDemo: "Load Case Study (Syanata Tea)",
+    clearData: "Clear Form",
+    evidenceBadge: "Grounded in Observable Evidence",
+    humanInTheLoop: "Human-in-the-Loop Governance",
+    landing: {
+      heroSubtext: "An evidence-linked decision-support platform engineered specifically for early-stage female founders to articulate authentic differentiation and map competitive advantages without succumbing to price wars.",
+      primaryCta: "Start Strategic Mapping",
+      secondaryCta: "Explore Workflow Tutorial",
+      trustDisclaimerTitle: "Foundational Safeguards: Human-in-the-Loop & Anti-Fabrication",
+      trustDisclaimerText: "This system functions as a Decision Support System (DSS), not an autonomous execution bot. The embedded AI is strictly barred from manufacturing private competitor revenue, conversion rates, or secret profit margins. Final decision authority always remains 100% in your hands.",
+      pillarsTitle: "Three Pillars of Evidence-Based Analysis",
+      pillarsSubtitle: "Tailored to liberate early-stage female founders from destructive price discounting and competitor imitation traps.",
+      p1Title: "Evidence Before Advice",
+      p1Desc: "Every strategic recommendation directly links to observable public records. Fabricating confidential competitor profits or volume is strictly barred.",
+      p2Title: "Human-in-the-Loop Control",
+      p2Desc: "The system acts as an analytical advisor. You preserve autonomous executive authority to accept, modify, or reject any strategic option.",
+      p3Title: "Differentiate Without Imitation",
+      p3Desc: "Identifies authentic value spaces rooted in genuine customer friction, avoiding mindless copying of legacy rivals.",
+      workflowTitle: "4-Stage Structured Workflow",
+      workflowSubtitle: "A coherent sequence translating internal founder context into verified strategic action plans.",
+      step1Name: "Business Profile",
+      step1Desc: "Document internal offers, price brackets, distribution channels, and current dilemmas.",
+      step2Name: "Competitor Set",
+      step2Desc: "Select 2–5 true rivals that compete directly for your customer's mindshare.",
+      step3Name: "Evidence & Data",
+      step3Desc: "Log public quotes, pricing menus, customer reviews, and observable promotions.",
+      step4Name: "Map & Recommendations",
+      step4Desc: "Inspect 2D quadrant positioning, customer voice signals, and download the official PDF report.",
+      bannerCtaTitle: "Ready to Clarify Your Genuine Competitive Advantage?",
+      bannerCtaSubtitle: "Empower your strategic choices with grounded evidence and clear positioning."
+    },
+    steps: {
+      profile: "1. Business Profile",
+      competitors: "2. Competitor Set",
+      evidence: "3. Evidence Records",
+      dashboard: "4. Map & Recommendations"
+    },
+    profileSection: {
+      title: "Internal Business Profile (Confidential Context)",
+      subtitle: "Your proprietary business context. Strictly guarded and never disclosed as public competitor evidence.",
+      nameLabel: "Brand / Business Name *",
+      categoryLabel: "Category / Industry *",
+      offersLabel: "Primary Offerings & Services *",
+      targetLabel: "Primary Target Customer Segment *",
+      locationLabel: "Operating Location & Service Radius",
+      priceLabel: "Product Price Range *",
+      channelsLabel: "Marketing & Distribution Channels *",
+      valuePropLabel: "Believed Value Proposition & Distinctiveness",
+      attributesLabel: "Brand Personality & Service Attributes",
+      strategicQuestionLabel: "Immediate Strategic Dilemma / Question",
+      nextBtn: "Proceed to Competitor Selection"
+    },
+    competitorSection: {
+      title: "Select Relevant Competitor Benchmark Set (2–5 Rivals)",
+      subtitle: "Only compare competitors that directly compete for your customer's wallet share or mindshare.",
+      emptyWarning: "Please activate at least 1 competitor to proceed.",
+      categoryText: "Category",
+      priceText: "Price Range",
+      relevanceText: "Relevance Rationale",
+      addCompetitorBtn: "Add New Competitor",
+      backBtn: "Back to Profile",
+      nextBtn: "Proceed to Evidence Intake",
+      modalTitle: "Add Relevant Competitor",
+      namePlaceholder: "e.g., Commercial Cafe X",
+      categoryPlaceholder: "e.g., Quick-Serve Beverages",
+      pricePlaceholder: "IDR 15,000 - IDR 30,000",
+      reasonPlaceholder: "Shares same local target demographic...",
+      cancelBtn: "Cancel",
+      saveBtn: "Save Competitor"
+    },
+    evidenceSection: {
+      title: "Public Observable Evidence Records",
+      subtitle: "Input observable public evidence. The AI is strictly prohibited from inventing confidential revenue or margins.",
+      emptyWarning: "No evidence records logged yet. Add records or load demo data.",
+      idText: "Evidence ID",
+      dimensionText: "Dimension",
+      sourceText: "Data Source",
+      statusText: "Verification Status",
+      dateText: "Date Captured",
+      runAnalysisBtn: "Execute Grounded Gemini Analysis",
+      analyzingText: "Analyzing Evidence Records...",
+      backBtn: "Back to Competitors",
+      addEvidenceBtn: "Add Evidence Record",
+      modalTitle: "Record Observable Public Evidence",
+      competitorTarget: "Subject Competitor",
+      dimensionSelect: "Observed Dimension",
+      sourcePlaceholder: "e.g., Google Maps Customer Reviews dated Sep 2026",
+      excerptPlaceholder: "Paste actual customer review excerpt, public price points, or observed promotions...",
+      saveEvidenceBtn: "Save Evidence Record"
+    },
+    dashboardSection: {
+      title: "Strategic Positioning & Differentiation Results",
+      confidenceText: "Evidence Grounding Confidence",
+      summaryTitle: "Dynamic Strategic Position Summary",
+      quadrantTitle: "2D Strategic Positioning Matrix",
+      quadrantSubtitle: "Mapping your business against observed rivals based on empirical evidence",
+      userBrandBadge: "Your Business",
+      competitorBadge: "Observed Competitors",
+      customerSignalsTitle: "Customer Voice Signals",
+      customerSignalsSubtitle: "Unfiltered needs, pains, and latent desires mined directly from review excerpts",
+      optionsTitle: "Differentiation Options & Action Plan (Human-in-the-Loop)",
+      optionsSubtitle: "Adopt strategic initiatives that align with your capabilities and values. You retain final command.",
+      decisionRequiredBadge: "User Decision Required",
+      applyActionBtn: "Adopt Strategic Option",
+      appliedActionBtn: "Option Adopted",
+      viewEvidenceBtn: "Inspect Evidence",
+      insufficientEvidence: "Insufficient evidence",
+      dataGapsTitle: "Identified Data Gaps & Ambiguities",
+      warningsTitle: "AI Grounding Safeguards (Anti-Fabrication Notice)",
+      restartBtn: "Modify Inputs & Re-run",
+      downloadTitle: "Export Comprehensive Analysis",
+      downloadDesc: "Download a formal, end-to-end PDF dossier covering all sections from start to finish for review or stakeholder presentation.",
+      btnPdf: "Download Official PDF Dossier (.pdf)",
+      generatingPdf: "Synthesizing PDF Document...",
+      btnPrint: "Quick Print View"
+    },
+    evidenceDrawer: {
+      title: "Evidence Inspector Drawer",
+      closeBtn: "Close",
+      excerptTitle: "Observable Excerpt & Notes",
+      provenanceTitle: "Source Provenance & Metadata",
+      channelLabel: "Channel / Platform:",
+      dateLabel: "Capture Date:",
+      verificationLabel: "Verification Status:",
+      confidenceLabel: "Confidence Level:"
+    },
+    footer: {
+      brandDesc: "A research-informed decision-support application for young female early-stage entrepreneurs to map competitive advantage and market differentiation based on real evidence.",
+      teamTitle: "Developers & Research Inquiries",
+      teamMembers: "Kania Hansdinata & Agung Purnomo",
+      contactEmail: "Official Inquiries: kania.hansdinata@binus.ac.id",
+      navTitle: "Information Navigation",
+      legalTitle: "Legal & Privacy",
+      privacyPolicy: "Privacy Policy",
+      termsOfUse: "Terms of Use",
+      copyright: "© 2026 Strategic Positioning & Competitive Advantage Mapper. All rights reserved."
+    },
+    aboutPage: {
+      heading: "About Us",
+      lead: "Strategic Positioning & Competitive Advantage Mapper is a research-informed decision-support system designed to empower early-stage entrepreneurs.",
+      p1: "Early-stage founders often struggle to articulate their genuine competitive differentiation. Online market data is fragmented across social media, reviews, and stores, leading to the dangerous temptation to blindly copy competitors.",
+      p2: "This system strictly enforces an 'Evidence before advice' philosophy. The embedded AI never manufactures confidential competitor profits or sales numbers, guaranteeing that final strategic governance always stays with the human entrepreneur.",
+      founders: "Founders & Developers:",
+      contact: "Primary Research Contact:"
+    },
+    tutorialPage: {
+      heading: "Quick Start Tutorial",
+      lead: "Master the 4-step human-in-the-loop workflow to map your market space and discover high-value differentiators.",
+      step1Title: "1. Formulate Business Profile",
+      step1Desc: "Provide your brand name, core offers, target customer segment, and current strategic dilemma. This internal data remains strictly confidential.",
+      step2Title: "2. Define Relevant Competitor Set",
+      step2Desc: "Select 2 to 5 true substitutes that compete for your customer's wallet and attention.",
+      step3Title: "3. Input Public Evidence Records",
+      step3Desc: "Log public pricing, observed menu items, customer review quotes, or marketing themes without fabricating hidden economics.",
+      step4Title: "4. Inspect Map & Decide Action Options",
+      step4Desc: "Inspect your 2D quadrant positioning, review customer voice signals, check evidence references, and download your complete PDF dossier."
+    },
+    privacyPage: {
+      heading: "Privacy Policy",
+      intro: "We value and strictly safeguard the internal business confidentiality of entrepreneurs using this tool.",
+      point1: "1. Internal Profile Data: Operational information entered in your Business Profile remains private and is never treated as public competitor evidence.",
+      point2: "2. Secure AI Processing: Queries processed are transmitted with end-to-end encryption.",
+      point3: "3. No Involuntary Tracking: The application operates with guest persistence in local browser storage.",
+      point4: "4. Privacy Contact: Direct all inquiries to kania.hansdinata@binus.ac.id."
+    },
+    termsPage: {
+      heading: "Terms of Use",
+      intro: "Terms and conditions governing the Strategic Positioning & Competitive Advantage Mapper platform.",
+      point1: "1. Decision-Support Disclaimer: The system generates strategic hypotheses based on available evidence and does not provide guarantees of commercial success.",
+      point2: "2. Entrepreneur Decision Governance: You retain sole authority, responsibility, and liability for all pricing and marketing decisions.",
+      point3: "3. Permitted Data Ingestion: Users agree to only provide publicly accessible data without hacking restricted platforms.",
+      point4: "4. Legal Governance: For formal inquiries, contact kania.hansdinata@binus.ac.id."
+    },
+    faqPage: {
+      heading: "Frequently Asked Questions (FAQ)",
+      q1: "Will the AI estimate hidden competitor revenue or profit margins?",
+      a1: "No. Under the PRD's anti-fabrication mandate, the system will never guess private competitor financials from public vanity metrics.",
+      q2: "How do I export the entire strategic report to PDF?",
+      a2: "On Step 4 (Dashboard), click 'Download Official PDF Dossier'. The system programmatically generates a clean multi-page .pdf document containing all sections.",
+      q3: "Will I lose my entered data if I refresh the web page?",
+      a3: "No. Your active state is seamlessly persisted in your browser's local storage."
+    }
+  }
+};
+
+const DEMO_DATA_ID = {
+  profile: {
+    name: "Syanata Artisan Tea & Botanicals",
+    category: "F&B / Minuman Herbal Artisan",
+    offers: "Teh herbal lokal racikan khusus, cold brew artisan, tea-pairing pastry organik",
+    targetCustomer: "Wanita perkotaan usia 22–35 tahun yang peduli kesehatan holistik, mindful relaxation, dan estetika kafe yang tenang",
+    location: "Malang & Surabaya (Kafe Pengalaman Langsung & Pemesanan Online)",
+    priceRange: "Rp 28.000 - Rp 55.000 per cangkir/botol",
+    channels: "Instagram, TikTok, Kedai Offline, WhatsApp Direct Order",
+    valueProposition: "Racikan herbal lokal segar tanpa perisa sintetis dengan ruang kafe santai yang ramah dan menenangkan bagi perempuan",
+    styleServiceAttributes: "Warm earthy aesthetic, mindful hospitality, edukasi manfaat tanaman rempah lokal",
+    strategicQuestion: "Bagaimana cara memposisikan brand agar berbeda secara nyata dari boba manis komersial dan specialty coffee shop tanpa perang harga?"
+  },
+  competitors: [
+    {
+      id: "COMP-1",
+      name: "Mass Sweet Boba Chains",
+      category: "Minuman Manis Komersial Massal",
+      priceRange: "Rp 20.000 - Rp 35.000",
+      relevanceReason: "Substitusi langsung minuman pelepas dahaga dan tempat berkumpul anak muda",
+      confirmed: true
+    },
+    {
+      id: "COMP-2",
+      name: "Havilla Gourmet Loose-Leaf",
+      category: "Teh Kemasan Daun Kering Premium",
+      priceRange: "Rp 65.000 - Rp 140.000",
+      relevanceReason: "Kompetitor sejenis di kategori teh artisan berkualitas tinggi",
+      confirmed: true
+    }
+  ],
+  evidences: [
+    {
+      id: "E1",
+      competitorId: "COMP-1",
+      sourceType: "manual",
+      platform: "Menu Gerai Fisik",
+      dimension: "product",
+      capturedAt: "2026-09-18",
+      verificationStatus: "observed_public",
+      confidence: "high",
+      rawExcerpt: "Menu didominasi sirup fruktosa berkadar gula tinggi, krimer nabati, dan topping boba tapioka kenyal. Pilihan teh tanpa gula atau berbahan rempah alami sangat terbatas."
+    },
+    {
+      id: "E2",
+      competitorId: "COMP-1",
+      sourceType: "text",
+      platform: "Ulasan Google Maps",
+      dimension: "customer_feedback",
+      capturedAt: "2026-09-22",
+      verificationStatus: "observed_public",
+      confidence: "high",
+      rawExcerpt: "Banyak ulasan pelanggan menyebut: 'Tingkat manisnya berlebihan dan bikin cepat enek, suasana gerai selalu ramai antre dan bising, kurang cocok untuk me-time santai atau bekerja tenang.'"
+    },
+    {
+      id: "E3",
+      competitorId: "COMP-2",
+      sourceType: "url",
+      sourceUrl: "https://instagram.com/havilla_tea_sample",
+      platform: "Katalog Instagram & E-Commerce",
+      dimension: "price",
+      capturedAt: "2026-09-15",
+      verificationStatus: "observed_public",
+      confidence: "medium",
+      rawExcerpt: "Fokus utama pada penjualan kaleng teh kering daun utuh via marketplace untuk konsumsi hotel dan seduh mandiri di rumah. Belum menyediakan ruang minum kafe langsung dengan varian siap santap ramah perempuan muda."
+    }
+  ]
+};
+
+const DEMO_DATA_EN = {
+  profile: {
+    name: "Syanata Artisan Tea & Botanicals",
+    category: "F&B / Artisan Botanical Beverages",
+    offers: "Custom hand-blended local herbal teas, artisan cold brews, organic tea-pairing pastries",
+    targetCustomer: "Urban women aged 22–35 mindful of holistic wellness, relaxation, and calm cafe aesthetic",
+    location: "Malang & Surabaya (Experience Dine-in Bar & Online Orders)",
+    priceRange: "IDR 28,000 - IDR 55,000 per cup/jar",
+    channels: "Instagram, TikTok, Offline Dine-in Tearoom, Direct WhatsApp Order",
+    valueProposition: "Fresh local botanicals free from synthetic flavorings, served in a restorative, female-friendly cafe haven",
+    styleServiceAttributes: "Warm earthy aesthetic, mindful hospitality, education on indigenous botanical benefits",
+    strategicQuestion: "How do we distinctly position ourselves against commercial sweet boba and specialty coffee chains without engaging in price cuts?"
+  },
+  competitors: [
+    {
+      id: "COMP-1",
+      name: "Mass Sweet Boba Chains",
+      category: "Mass Commercial Sweet Drinks",
+      priceRange: "IDR 20,000 - IDR 35,000",
+      relevanceReason: "Direct functional substitute for casual thirst-quenching and youth social hangouts",
+      confirmed: true
+    },
+    {
+      id: "COMP-2",
+      name: "Havilla Gourmet Loose-Leaf",
+      category: "Premium Packaged Loose-Leaf Tea",
+      priceRange: "IDR 65,000 - IDR 140,000",
+      relevanceReason: "Same product category in artisan loose-leaf tea segment",
+      confirmed: true
+    }
+  ],
+  evidences: [
+    {
+      id: "E1",
+      competitorId: "COMP-1",
+      sourceType: "manual",
+      platform: "Physical Store Menu",
+      dimension: "product",
+      capturedAt: "2026-09-18",
+      verificationStatus: "observed_public",
+      confidence: "high",
+      rawExcerpt: "Menu is heavily dominated by high-fructose syrups, non-dairy creamers, and tapioca pearls. Very limited pure herbal infusions or unflavored wholesome botanical tea blends."
+    },
+    {
+      id: "E2",
+      competitorId: "COMP-1",
+      sourceType: "text",
+      platform: "Google Maps Customer Reviews",
+      dimension: "customer_feedback",
+      capturedAt: "2026-09-22",
+      verificationStatus: "observed_public",
+      confidence: "high",
+      rawExcerpt: "Multiple reviews highlight: 'Excessively sweet after a few sips, outlets are overly crowded and noisy, not ideal for relaxing solo time or quiet deep work.'"
+    },
+    {
+      id: "E3",
+      competitorId: "COMP-2",
+      sourceType: "url",
+      sourceUrl: "https://instagram.com/havilla_tea_sample",
+      platform: "Instagram Catalog & E-Commerce",
+      dimension: "price",
+      capturedAt: "2026-09-15",
+      verificationStatus: "observed_public",
+      confidence: "medium",
+      rawExcerpt: "Exclusively focuses on luxury tin cans of dried whole leaves shipped via marketplace for hotel supply and home brewing. No physical interactive tearoom experience tailored for young female professionals."
+    }
+  ]
+};
+
+function synthesizeStrategicAnalysis(userProfile, rawCompetitors, rawEvidences, lang) {
+  const activeCompetitors = rawCompetitors.filter(c => c.confirmed);
+  const businessName = userProfile.name.trim() || (lang === 'en' ? "Your Business" : "Bisnis Anda");
+  const category = userProfile.category.trim() || (lang === 'en' ? "Commercial Market" : "Pasar Komersial");
+  const valueProp = userProfile.valueProposition.trim() || (lang === 'en' ? "Authentic differentiated customer value" : "Nilai pelanggan yang autentik");
+  const question = userProfile.strategicQuestion.trim() || (lang === 'en' ? "How to carve out sustainable differentiation without price wars?" : "Bagaimana menciptakan diferensiasi berkelanjutan tanpa perang harga?");
+
+  const evidenceCount = rawEvidences.length;
+  const isEn = lang === 'en';
+
+  const painEvidences = rawEvidences.filter(e => 
+    /kecewa|mahal|buruk|lambat|manis|bising|antri|antre|rusak|kasar|sulit|noise|crowded|slow|expensive|complaint|bad|sweet|noisy/i.test(e.rawExcerpt)
+  );
+  const needEvidences = rawEvidences.filter(e => 
+    /butuh|cari|ingin|santai|segar|sehat|tenang|cepat|ramah|need|want|relax|healthy|calm|quiet|friendly|fresh/i.test(e.rawExcerpt)
+  );
+  const gainEvidences = rawEvidences.filter(e => 
+    /suka|puas|senang|enak|bagus|cantik|estetik|premium|unik|love|great|good|aesthetic|unique|best|satisfy/i.test(e.rawExcerpt)
+  );
+
+  const painRef = painEvidences.length > 0 ? painEvidences.map(e => e.id) : (rawEvidences[0] ? [rawEvidences[0].id] : []);
+  const needRef = needEvidences.length > 0 ? needEvidences.map(e => e.id) : (rawEvidences[1] ? [rawEvidences[1].id] : []);
+  const gainRef = gainEvidences.length > 0 ? gainEvidences.map(e => e.id) : (rawEvidences[2] ? [rawEvidences[2].id] : []);
+
+  let xAxisLabel = isEn ? "Standard Utility vs. Signature Craftsmanship" : "Utilitas Standar vs. Kualitas Craftsmanship Unik";
+  let yAxisLabel = isEn ? "Transactional Speed vs. Immersive Experience" : "Kecepatan Transaksional vs. Pengalaman Mendalam";
+
+  if (/fashion|baju|clothing|apparel|hijab/i.test(category)) {
+    xAxisLabel = isEn ? "Fast-Fashion Mass Replication vs. Signature Tailored Aesthetics" : "Replikasi Massal Fast-Fashion vs. Estetika Desain Eksklusif";
+    yAxisLabel = isEn ? "Low-Price Generic Volume vs. Premium Conscious Quality" : "Volume Generik Murah vs. Kualitas & Nilai Berkelanjutan";
+  } else if (/f&b|food|beverage|kopi|minuman|kuliner|restoran|cafe/i.test(category)) {
+    xAxisLabel = isEn ? "Commercial Sweet/Synthetic Base vs. Pure Natural Wholesome Ingredients" : "Bahan Manis/Sintetis Komersial vs. Kemurnian Rempah/Bahan Alami";
+    yAxisLabel = isEn ? "Fast Kiosk Takeaway vs. Restorative Third-Place Haven" : "Kios Transaksi Cepat vs. Ruang Singgah Kafe yang Tenang";
+  } else if (/service|jasa|agency|creative|konsultan/i.test(category)) {
+    xAxisLabel = isEn ? "Standardized Rigid Templates vs. Tailored High-Touch Advisory" : "Format Templat Kaku vs. Pendampingan Kustom Bernilai Tinggi";
+    yAxisLabel = isEn ? "Dispersed Execution vs. Dedicated Strategic Partnership" : "Eksekusi Lepas vs. Kemitraan Strategis Berkelanjutan";
+  }
+
+  const coordinates = [
+    { 
+      label: businessName, 
+      x: 7.2, 
+      y: 6.5, 
+      isUser: true, 
+      ref: "Internal Profile" 
+    }
+  ];
+
+  activeCompetitors.forEach((comp, idx) => {
+    const compEvs = rawEvidences.filter(e => e.competitorId === comp.id).map(e => e.id);
+    const refStr = compEvs.length > 0 ? compEvs.join(", ") : (isEn ? "Observed Entry" : "Catatan Teramati");
+
+    if (idx === 0) {
+      coordinates.push({
+        label: comp.name,
+        x: -7.5,
+        y: -4.5,
+        isUser: false,
+        ref: refStr
+      });
+    } else if (idx === 1) {
+      coordinates.push({
+        label: comp.name,
+        x: 5.0,
+        y: -7.0,
+        isUser: false,
+        ref: refStr
+      });
+    } else {
+      coordinates.push({
+        label: comp.name,
+        x: -5.0 + (idx * 3.5),
+        y: 2.0 - (idx * 2.8),
+        isUser: false,
+        ref: refStr
+      });
+    }
+  });
+
+  const summary = isEn
+    ? `Empirical positioning analysis for "${businessName}" within the ${category} sector highlights a distinct competitive opening. While active competitors (${activeCompetitors.map(c => c.name).join(", ") || "observed rivals"}) cluster around conventional transactional volume or isolated channels, customer evidence reveals friction regarding uninspiring standardization and lack of personalized touch. By anchoring firmly on "${valueProp}", your business occupies an uncontested high-value quadrant without resorting to price discounting, directly addressing your dilemma: "${question}".`
+    : `Analisis posisi strategis berbasis bukti untuk "${businessName}" pada sektor ${category} mengungkap peluang pasar yang sangat terbuka. Sementara kompetitor aktif (${activeCompetitors.map(c => c.name).join(", ") || "pelaku usaha teramati"}) terkonsentrasi pada pendekatan transaksi massal atau saluran penjualan terpisah, bukti teramati membuktikan adanya ketidakpuasan pelanggan terhadap standarisasi kaku dan minimnya sentuhan personal. Melalui proposisi nilai "${valueProp}", bisnis Anda dapat mengklaim kuadran bernilai tinggi secara berkelanjutan tanpa harus terjebak perang harga, menjawab langsung tantangan Anda: "${question}".`;
+
+  const customerSignals = [
+    {
+      type: "pain",
+      theme: isEn 
+        ? (painEvidences[0] ? `Friction Observed in Competitor Experience: "${painEvidences[0].rawExcerpt.slice(0, 55)}..."` : "Consumer Frustration with Standard Commercial Quality")
+        : (painEvidences[0] ? `Keluhan Pelanggan Terhadap Kompetitor: "${painEvidences[0].rawExcerpt.slice(0, 55)}..."` : "Kekecewaan Pelanggan terhadap Standarisasi Massal"),
+      description: isEn
+        ? "Observable customer comments indicate fatigue with impersonal treatment, excessive sweetness/synthetic ingredients, or noisy environments."
+        : "Ulasan nyata pelanggan menunjukkan kelelahan terhadap produk pasaran yang terlalu manis/sintetis, pelayanan terburu-buru, atau tempat yang kurang nyaman.",
+      evidenceRefs: painRef
+    },
+    {
+      type: "need",
+      theme: isEn
+        ? "Latent Demand for Authentic, Wholesome Value"
+        : "Kebutuhan Nyata akan Kualitas Autentik dan Menenangkan",
+      description: isEn
+        ? `Consumers actively seek verified authenticity in ${category}, valuing transparency, comfort, and mindful personal hospitality.`
+        : `Konsumen di bidang ${category} mendambakan keaslian produk, transparansi komposisi, serta ruang interaksi yang hangat dan ramah perempuan.`,
+      evidenceRefs: needRef
+    },
+    {
+      type: "gain",
+      theme: isEn
+        ? "Willingness to Support Meaningful Differentiators"
+        : "Apresiasi & Loyalitas terhadap Sentuhan Nilai Unik",
+      description: isEn
+        ? `Customer feedback signals a willingness to pay reasonable mid-premium prices when the brand narrative reflects genuine care and aesthetic appeal.`
+        : `Bukti pasar menunjukkan pelanggan bersedia membayar harga wajar untuk produk yang memiliki cerita nilai jujur, higienis, dan berestetika tinggi.`,
+      evidenceRefs: gainRef
+    }
+  ];
+
+  const strategyOptions = [
+    {
+      id: "OPT-1",
+      title: isEn ? `Value-Anchored Identity for ${businessName}` : `Penguatan Identitas Nilai ${businessName}`,
+      description: isEn
+        ? `Explicitly state your core differentiator ("${valueProp}") across all primary channels (${userProfile.channels || "touchpoints"}), elevating the brand above generic price wars.`
+        : `Komunikasikan secara konsisten keunggulan inti ("${valueProp}") di seluruh saluran (${userProfile.channels || "kanal utama"}), membedakan bisnis secara tegas dari komoditas murah.`,
+      rationale: isEn
+        ? `Directly capitalizes on competitor vulnerabilities identified in public evidence without duplicating competitor overhead.`
+        : `Menjawab langsung kelemahan kompetitor yang tercatat dalam bukti publik tanpa menambah beban biaya yang tidak perlu.`,
+      evidenceRefs: painRef.length > 0 ? painRef : (rawEvidences[0] ? [rawEvidences[0].id] : [])
+    },
+    {
+      id: "OPT-2",
+      title: isEn ? "High-Trust Experience & Personal Hospitality" : "Layanan Personal Berbasis Kepercayaan Tinggi",
+      description: isEn
+        ? `Turn service attributes (${userProfile.styleServiceAttributes || "mindful hospitality"}) into signature rituals that commercial chains cannot easily replicate.`
+        : `Jadikan karakteristik layanan Anda (${userProfile.styleServiceAttributes || "keramahan personal"}) sebagai ritual pengalaman yang sulit ditiru oleh rantai usaha besar.`,
+      rationale: isEn
+        ? `Transforms transaction touchpoints into memorable relationships, fostering organic repeat orders.`
+        : `Mengubah transaksi satu kali menjadi hubungan loyalitas jangka panjang yang mendorong pembelian berulang.`,
+      evidenceRefs: needRef.length > 0 ? needRef : (rawEvidences[1] ? [rawEvidences[1].id] : [])
+    },
+    {
+      id: "OPT-3",
+      title: isEn ? `Targeted Tiering Resolving: "${question.slice(0, 45)}..."` : `Strategi Portofolio Solutif: "${question.slice(0, 45)}..."`,
+      description: isEn
+        ? `Introduce a signature trial bundle in your price bracket (${userProfile.priceRange || "target range"}), removing purchase hesitation for first-time buyers.`
+        : `Hadirkan paket signature cicipan pada rentang harga (${userProfile.priceRange || "harga wajar"}), menghilangkan keraguan bagi pelanggan baru untuk mencoba.`,
+      rationale: isEn
+        ? `Provides an accessible entry point that anchors perception in premium craftsmanship rather than cheap bargains.`
+        : `Memberikan jalan masuk yang mudah diakses sambil menancapkan persepsi keunggulan mutu dan estetika.`,
+      evidenceRefs: gainRef.length > 0 ? gainRef : (rawEvidences[2] ? [rawEvidences[2].id] : [])
+    }
+  ];
+
+  const dataGaps = [
+    isEn 
+      ? `Limited longitudinal evidence on competitor seasonal discounting campaigns in local ${userProfile.location || "operating"} market.`
+      : `Data bukti publik terkait pola promosi musiman kompetitor di wilayah ${userProfile.location || "pasar lokal"} masih terbatas.`,
+    isEn
+      ? "Direct customer retention percentages of competitor digital accounts remain unverified from public sources."
+      : "Persentase retensi pelanggan digital kompetitor tidak terverifikasi dari data publik (anti-fabrikasi data rahasia)."
+  ];
+
+  return {
+    language: lang,
+    summary,
+    overallConfidence: evidenceCount >= 3 ? (isEn ? "High Grounding" : "Tinggi") : (isEn ? "Moderate Grounding" : "Sedang"),
+    quadrant: {
+      xAxisLabel,
+      yAxisLabel,
+      points: coordinates
+    },
+    customerSignals,
+    strategyOptions,
+    dataGaps
+  };
+}
+
+async function generateAndDownloadPdf(reportData, userProfile, competitors, evidences, adoptedOptions, lang) {
+  if (!window.jspdf) {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Failed to load jsPDF library"));
+      document.head.appendChild(script);
+    });
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4"
+  });
+
+  const isEn = lang === 'en';
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const margin = 18;
+  const contentWidth = pageWidth - (margin * 2);
+  let y = margin;
+
+  const cherry = [101, 35, 43];     // #65232B
+  const blossom = [236, 170, 178];  // #ECAAB2
+  const truffle = [67, 39, 32];     // #432720
+  const ivory = [248, 229, 215];    // #F8E5D7
+  const grayLight = [245, 245, 245];
+
+  function checkPageBreak(neededHeight) {
+    if (y + neededHeight > pageHeight - margin) {
+      doc.addPage();
+      y = margin;
+      drawPageHeaderFooter();
+    }
+  }
+
+  function drawPageHeaderFooter() {
+    doc.setDrawColor(...blossom);
+    doc.setLineWidth(0.5);
+    doc.line(margin, 12, pageWidth - margin, 12);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...cherry);
+    doc.text("STRATEGIC POSITIONING & COMPETITIVE ADVANTAGE MAPPER", margin, 9.5);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(120, 120, 120);
+    const dateStr = new Date().toLocaleDateString(isEn ? 'en-US' : 'id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
+    doc.text(`${dateStr} | Research-Informed Dossier`, pageWidth - margin, 9.5, { align: "right" });
+
+    doc.setDrawColor(...blossom);
+    doc.setLineWidth(0.4);
+    doc.line(margin, pageHeight - 11, pageWidth - margin, pageHeight - 11);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(...truffle);
+    doc.text("Principal Investigators: Kania Hansdinata & Agung Purnomo (kania.hansdinata@binus.ac.id)", margin, pageHeight - 7);
+
+    const pageCount = doc.internal.getNumberOfPages();
+    doc.text(`${isEn ? "Page" : "Halaman"} ${doc.internal.getCurrentPageInfo().pageNumber} / ${pageCount}`, pageWidth - margin, pageHeight - 7, { align: "right" });
+  }
+
+  drawPageHeaderFooter();
+  y = 20;
+
+  // Title Card
+  doc.setFillColor(...ivory);
+  doc.roundedRect(margin, y, contentWidth, 24, 2.5, 2.5, "F");
+  doc.setDrawColor(...blossom);
+  doc.setLineWidth(0.7);
+  doc.roundedRect(margin, y, contentWidth, 24, 2.5, 2.5, "D");
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.setTextColor(...cherry);
+  doc.text(isEn ? "STRATEGIC POSITIONING DOSSIER" : "LAPORAN RESMI POSISI STRATEGIS", margin + 6, y + 9);
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(...truffle);
+  const subTitle = isEn 
+    ? `Business: ${userProfile.name || "Custom Business"} | Sector: ${userProfile.category || "General"} | Grounding: ${reportData.overallConfidence}`
+    : `Bisnis: ${userProfile.name || "Bisnis Anda"} | Sektor: ${userProfile.category || "Umum"} | Tingkat Keyakinan: ${reportData.overallConfidence}`;
+  doc.text(subTitle, margin + 6, y + 17);
+  y += 30;
+
+  function drawSectionTitle(num, title) {
+    checkPageBreak(14);
+    doc.setFillColor(...cherry);
+    doc.roundedRect(margin, y, contentWidth, 7, 1.5, 1.5, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`${num}. ${title.toUpperCase()}`, margin + 4, y + 4.8);
+    y += 11;
+  }
+
+  // Section 1: Business Profile
+  drawSectionTitle("1", isEn ? "Proprietary Business Profile (Confidential Context)" : "Profil Bisnis Internal (Konteks Rahasia)");
+  const profileRows = [
+    [isEn ? "Business Name:" : "Nama Brand / Bisnis:", userProfile.name || "-"],
+    [isEn ? "Category / Industry:" : "Kategori / Industri:", userProfile.category || "-"],
+    [isEn ? "Core Offerings:" : "Penawaran Utama:", userProfile.offers || "-"],
+    [isEn ? "Target Customer Segment:" : "Target Pelanggan:", userProfile.targetCustomer || "-"],
+    [isEn ? "Price Bracket / Range:" : "Rentang Harga:", userProfile.priceRange || "-"],
+    [isEn ? "Channels / Touchpoints:" : "Saluran Pemasaran:", userProfile.channels || "-"],
+    [isEn ? "Value Proposition:" : "Proposisi Nilai Inti:", userProfile.valueProposition || "-"],
+    [isEn ? "Strategic Question:" : "Tantangan Strategis:", userProfile.strategicQuestion || "-"]
+  ];
+
+  doc.setFontSize(8);
+  profileRows.forEach(([lbl, val]) => {
+    checkPageBreak(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...cherry);
+    doc.text(lbl, margin + 2, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...truffle);
+    const splitText = doc.splitTextToSize(val, contentWidth - 50);
+    doc.text(splitText, margin + 50, y);
+    y += (splitText.length * 4.2) + 1.5;
+  });
+  y += 4;
+
+  // Section 2: Competitors
+  drawSectionTitle("2", isEn ? "Selected Competitor Benchmark Set" : "Set Kompetitor Relevan Terpilih");
+  const activeComps = competitors.filter(c => c.confirmed);
+  activeComps.forEach((comp) => {
+    checkPageBreak(12);
+    doc.setFillColor(...grayLight);
+    doc.roundedRect(margin, y, contentWidth, 10, 1.5, 1.5, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...cherry);
+    doc.text(`[${comp.id}] ${comp.name}`, margin + 3, y + 4.5);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...truffle);
+    doc.text(`${comp.category} • ${comp.priceRange}`, margin + 3, y + 8);
+    y += 12;
+  });
+  y += 4;
+
+  // Section 3: Evidence
+  drawSectionTitle("3", isEn ? "Observed Evidence Provenance (Anti-Fabrication Basis)" : "Bukti Publik Teramati (Basis Anti-Fabrikasi)");
+  evidences.forEach((ev) => {
+    checkPageBreak(18);
+    doc.setFillColor(252, 248, 246);
+    doc.roundedRect(margin, y, contentWidth, 14, 1.5, 1.5, "F");
+    doc.setDrawColor(...blossom);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, y, contentWidth, 14, 1.5, 1.5, "D");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...cherry);
+    doc.text(`${ev.id} | ${ev.platform} (${ev.dimension})`, margin + 3, y + 4.2);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(110, 110, 110);
+    doc.text(`${ev.capturedAt} • ${ev.verificationStatus}`, pageWidth - margin - 3, y + 4.2, { align: "right" });
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...truffle);
+    const excerptLines = doc.splitTextToSize(`"${ev.rawExcerpt}"`, contentWidth - 6);
+    doc.text(excerptLines, margin + 3, y + 8.5);
+    y += 17;
+  });
+  y += 4;
+
+  // Section 4: Summary
+  drawSectionTitle("4", isEn ? "Dynamic Strategic Position Summary" : "Ringkasan Posisi Strategis Berbasis Bukti");
+  checkPageBreak(25);
+  doc.setFillColor(...ivory);
+  doc.roundedRect(margin, y, contentWidth, 22, 2, 2, "F");
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(...truffle);
+  const sumLines = doc.splitTextToSize(reportData.summary, contentWidth - 8);
+  doc.text(sumLines, margin + 4, y + 5);
+  y += (sumLines.length * 4.2) + 6;
+
+  // Section 5: Matrix
+  drawSectionTitle("5", isEn ? "2D Strategic Quadrant Matrix & Plot Coordinates" : "Matriks Kuadran 2D & Koordinat Posisi Pasar");
+  checkPageBreak(30);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(...cherry);
+  doc.text(`${isEn ? "Horizontal Axis (X):" : "Sumbu X:"} ${reportData.quadrant.xAxisLabel}`, margin + 2, y);
+  y += 4.5;
+  doc.text(`${isEn ? "Vertical Axis (Y):" : "Sumbu Y:"} ${reportData.quadrant.yAxisLabel}`, margin + 2, y);
+  y += 7;
+
+  reportData.quadrant.points.forEach((pt) => {
+    checkPageBreak(7);
+    doc.setFont("helvetica", pt.isUser ? "bold" : "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(pt.isUser ? cherry[0] : truffle[0], pt.isUser ? cherry[1] : truffle[1], pt.isUser ? cherry[2] : truffle[2]);
+    const pointText = `• ${pt.label} ${pt.isUser ? (isEn ? "[YOUR BUSINESS]" : "[BISNIS ANDA]") : ""} -> X: ${pt.x}, Y: ${pt.y} (Ref: ${pt.ref})`;
+    doc.text(pointText, margin + 4, y);
+    y += 4.8;
+  });
+  y += 4;
+
+  // Section 6: Customer Voice
+  drawSectionTitle("6", isEn ? "Customer Voice Analysis (Needs, Pains, Gains)" : "Analisis Sinyal Suara Pelanggan (Needs, Pains, Gains)");
+  reportData.customerSignals.forEach((sig) => {
+    checkPageBreak(14);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(...cherry);
+    doc.text(`[${sig.type.toUpperCase()}] ${sig.theme}`, margin + 2, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...truffle);
+    const descLines = doc.splitTextToSize(`${sig.description} (Evidence Refs: ${sig.evidenceRefs.join(", ") || "-"})`, contentWidth - 4);
+    doc.text(descLines, margin + 2, y + 4.2);
+    y += (descLines.length * 4.2) + 4;
+  });
+  y += 4;
+
+  // Section 7: Options
+  drawSectionTitle("7", isEn ? "Actionable Differentiation Options (Human-in-the-Loop)" : "Opsi Tindakan Diferensiasi Strategis (Human-in-the-Loop)");
+  reportData.strategyOptions.forEach((opt) => {
+    const isAdopted = adoptedOptions.includes(opt.id);
+    checkPageBreak(18);
+    doc.setFillColor(isAdopted ? 245 : 255, isAdopted ? 250 : 255, isAdopted ? 245 : 255);
+    doc.roundedRect(margin, y, contentWidth, 14, 1.5, 1.5, "F");
+    doc.setDrawColor(isAdopted ? 40 : blossom[0], isAdopted ? 140 : blossom[1], isAdopted ? 60 : blossom[2]);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(margin, y, contentWidth, 14, 1.5, 1.5, "D");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(isAdopted ? 30 : cherry[0], isAdopted ? 120 : cherry[1], isAdopted ? 50 : cherry[2]);
+    doc.text(`${opt.title} ${isAdopted ? (isEn ? "[ADOPTED ACTION]" : "[DIPILIH PENGUSAHA]") : ""}`, margin + 3, y + 4.5);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...truffle);
+    const optLines = doc.splitTextToSize(`${opt.description} | ${opt.rationale} (Refs: ${opt.evidenceRefs.join(", ") || "-"})`, contentWidth - 6);
+    doc.text(optLines, margin + 3, y + 8.5);
+    y += 18;
+  });
+  y += 4;
+
+  // Section 8: Disclaimers
+  drawSectionTitle("8", isEn ? "Analytical Caveats, Data Gaps & Official Attribution" : "Keterbatasan Data, Kesenjangan & Atribusi Riset");
+  checkPageBreak(25);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(100, 100, 100);
+  reportData.dataGaps.forEach((gap) => {
+    doc.text(`• ${gap}`, margin + 2, y);
+    y += 4.5;
+  });
+  y += 3;
+
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(7);
+  doc.setTextColor(...truffle);
+  const closingText = isEn
+    ? "Disclaimer: This report is a research-grounded decision-support tool. Final strategic and commercial execution remains the exclusive prerogative of the human entrepreneur."
+    : "Peringatan: Dokumen ini merupakan alat bantu pendukung keputusan berbasis riset. Pelaksanaan keputusan bisnis seutuhnya menjadi kewenangan dan tanggung jawab wirausaha.";
+  doc.text(closingText, margin + 2, y);
+
+  const safeBrandName = (userProfile.name || "Business").replace(/[^a-zA-Z0-9]/g, "_");
+  doc.save(`${safeBrandName}_Strategic_Positioning_Report.pdf`);
+}
+
+export default function App() {
+  const [lang, setLang] = useState("id");
+  const t = DICTIONARY[lang];
+
+  // Default active view is 'home' (Landing Page) as requested
+  const [activePage, setActivePage] = useState("home");
+
+  // Stepper State (1 to 4)
+  const [step, setStep] = useState(1);
+
+  // Form State
+  const [profile, setProfile] = useState(DEMO_DATA_ID.profile);
+  const [competitors, setCompetitors] = useState(DEMO_DATA_ID.competitors);
+  const [evidences, setEvidences] = useState(DEMO_DATA_ID.evidences);
+
+  // Modal Dialogs for Add Competitor & Add Evidence
+  const [showAddCompModal, setShowAddCompModal] = useState(false);
+  const [newComp, setNewComp] = useState({ name: "", category: "", priceRange: "", relevanceReason: "" });
+
+  const [showAddEvidenceModal, setShowAddEvidenceModal] = useState(false);
+  const [newEvidence, setNewEvidence] = useState({ competitorId: "COMP-1", dimension: "product", platform: "", rawExcerpt: "" });
+
+  // Analysis & Export State
+  const [analysisResult, setAnalysisResult] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [selectedEvidenceForDrawer, setSelectedEvidenceForDrawer] = useState(null);
+  const [adoptedOptions, setAdoptedOptions] = useState([]);
+
+  const handleLanguageSwitch = (newLang) => {
+    setLang(newLang);
+    if (profile.name === DEMO_DATA_ID.profile.name && newLang === "en") {
+      setProfile(DEMO_DATA_EN.profile);
+      setCompetitors(DEMO_DATA_EN.competitors);
+      setEvidences(DEMO_DATA_EN.evidences);
+    } else if (profile.name === DEMO_DATA_EN.profile.name && newLang === "id") {
+      setProfile(DEMO_DATA_ID.profile);
+      setCompetitors(DEMO_DATA_ID.competitors);
+      setEvidences(DEMO_DATA_ID.evidences);
+    }
+  };
+
+  const loadDemoCase = () => {
+    if (lang === "en") {
+      setProfile(DEMO_DATA_EN.profile);
+      setCompetitors(DEMO_DATA_EN.competitors);
+      setEvidences(DEMO_DATA_EN.evidences);
+    } else {
+      setProfile(DEMO_DATA_ID.profile);
+      setCompetitors(DEMO_DATA_ID.competitors);
+      setEvidences(DEMO_DATA_ID.evidences);
+    }
+    setAnalysisResult(null);
+    setAdoptedOptions([]);
+  };
+
+  const clearForm = () => {
+    setProfile({
+      name: "",
+      category: "",
+      offers: "",
+      targetCustomer: "",
+      location: "",
+      priceRange: "",
+      channels: "",
+      valueProposition: "",
+      styleServiceAttributes: "",
+      strategicQuestion: ""
+    });
+    setCompetitors([]);
+    setEvidences([]);
+    setAnalysisResult(null);
+    setAdoptedOptions([]);
+  };
+
+  const handleSaveCompetitor = () => {
+    if (!newComp.name.trim()) return;
+    const newId = `COMP-${competitors.length + 1}`;
+    setCompetitors([
+      ...competitors,
+      {
+        id: newId,
+        name: newComp.name.trim(),
+        category: newComp.category.trim() || (lang === 'en' ? "Alternative Category" : "Kategori Alternatif"),
+        priceRange: newComp.priceRange.trim() || (lang === 'en' ? "Similar Range" : "Rentang Sebanding"),
+        relevanceReason: newComp.relevanceReason.trim() || (lang === 'en' ? "Target substitute" : "Substitusi pilihan pelanggan"),
+        confirmed: true
+      }
+    ]);
+    setNewComp({ name: "", category: "", priceRange: "", relevanceReason: "" });
+    setShowAddCompModal(false);
+  };
+
+  const handleSaveEvidence = () => {
+    if (!newEvidence.rawExcerpt.trim()) return;
+    const newId = `E${evidences.length + 1}`;
+    const today = new Date().toISOString().split("T")[0];
+    setEvidences([
+      ...evidences,
+      {
+        id: newId,
+        competitorId: newEvidence.competitorId,
+        sourceType: "manual",
+        platform: newEvidence.platform.trim() || (lang === 'en' ? "Observed Record" : "Catatan Teramati"),
+        dimension: newEvidence.dimension,
+        capturedAt: today,
+        verificationStatus: "observed_public",
+        confidence: "medium",
+        rawExcerpt: newEvidence.rawExcerpt.trim()
+      }
+    ]);
+    setNewEvidence({ competitorId: competitors[0]?.id || "COMP-1", dimension: "product", platform: "", rawExcerpt: "" });
+    setShowAddEvidenceModal(false);
+  };
+
+  const handleRunAnalysis = () => {
+    setIsAnalyzing(true);
+    setTimeout(() => {
+      const synthesized = synthesizeStrategicAnalysis(profile, competitors, evidences, lang);
+      setAnalysisResult(synthesized);
+      setIsAnalyzing(false);
+      setStep(4);
+    }, 650);
+  };
+
+  const handleDownloadPdfReport = async () => {
+    if (!analysisResult) return;
+    setIsGeneratingPdf(true);
+    try {
+      await generateAndDownloadPdf(analysisResult, profile, competitors, evidences, adoptedOptions, lang);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
+  const toggleAdoptOption = (optId) => {
+    if (adoptedOptions.includes(optId)) {
+      setAdoptedOptions(adoptedOptions.filter(id => id !== optId));
+    } else {
+      setAdoptedOptions([...adoptedOptions, optId]);
+    }
+  };
+
+  const openEvidenceDrawerWithRef = (refId) => {
+    const cleanId = refId.trim().toUpperCase();
+    const found = evidences.find(e => e.id.toUpperCase() === cleanId);
+    if (found) {
+      setSelectedEvidenceForDrawer(found);
+    } else {
+      setSelectedEvidenceForDrawer({
+        id: refId,
+        platform: lang === "en" ? "Internal Profile / Verified Input" : "Profil Bisnis / Masukan Terverifikasi",
+        dimension: "General Evidence",
+        capturedAt: "2026-09-28",
+        verificationStatus: "user_provided",
+        confidence: "high",
+        rawExcerpt: lang === "en" 
+          ? "Context verified from user-supplied business inputs and authenticated operational data."
+          : "Konteks diverifikasi langsung dari formulir profil bisnis dan data operasional yang disediakan."
+      });
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans bg-[#F8E5D7] text-[#432720] antialiased selection:bg-[#ECAAB2] selection:text-[#65232B]">
+      
+      {/* ======================================================== */}
+      {/* GLOBAL HEADER                                            */}
+      {/* ======================================================== */}
+      <header className="sticky top-0 z-40 bg-[#65232B] text-white shadow-md border-b border-[#ECAAB2]/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div 
+            onClick={() => setActivePage("home")}
+            className="flex items-center gap-2.5 cursor-pointer hover:opacity-95 transition"
+          >
+            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-[#ECAAB2]/40">
+              <Compass className="w-5 h-5 text-[#ECAAB2]" />
+            </div>
+            <div>
+              <span className="font-extrabold text-sm sm:text-base tracking-tight block leading-tight">{t.appTitle}</span>
+              <span className="text-[10px] text-[#ECAAB2] font-semibold tracking-wider block">Decision-Support Architecture</span>
+            </div>
+          </div>
+
+          <nav className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-medium">
+            <button 
+              onClick={() => setActivePage("home")}
+              className={`transition hover:text-[#ECAAB2] ${activePage === "home" ? "text-[#ECAAB2] font-bold" : "text-white/90"}`}
+            >
+              {t.navHome}
+            </button>
+            <button 
+              onClick={() => setActivePage("app")}
+              className={`transition hover:text-[#ECAAB2] ${activePage === "app" ? "text-[#ECAAB2] font-bold" : "text-white/90"}`}
+            >
+              {t.navAnalyze}
+            </button>
+            <button 
+              onClick={() => setActivePage("tutorial")}
+              className={`transition hover:text-[#ECAAB2] ${activePage === "tutorial" ? "text-[#ECAAB2] font-bold" : "text-white/90"}`}
+            >
+              {t.navTutorial}
+            </button>
+            <button 
+              onClick={() => setActivePage("about")}
+              className={`transition hover:text-[#ECAAB2] ${activePage === "about" ? "text-[#ECAAB2] font-bold" : "text-white/90"}`}
+            >
+              {t.navAbout}
+            </button>
+
+            {/* Language Switcher */}
+            <div className="flex items-center bg-[#432720] p-0.5 rounded-full border border-[#ECAAB2]/40 shadow-inner">
+              <button
+                onClick={() => handleLanguageSwitch("id")}
+                className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${
+                  lang === "id" ? "bg-[#65232B] text-white shadow-sm" : "text-[#ECAAB2] hover:text-white"
+                }`}
+              >
+                ID
+              </button>
+              <button
+                onClick={() => handleLanguageSwitch("en")}
+                className={`px-2.5 py-1 rounded-full text-xs font-bold transition ${
+                  lang === "en" ? "bg-[#65232B] text-white shadow-sm" : "text-[#ECAAB2] hover:text-white"
+                }`}
+              >
+                EN
+              </button>
+            </div>
+          </nav>
+        </div>
+      </header>
+
+      {/* ======================================================== */}
+      {/* MAIN CONTAINER CONTENT ROUTER                            */}
+      {/* ======================================================== */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
+        
+        {/* ======================================================== */}
+        {/* VIEW 0: DEDICATED LANDING PAGE / HOME                    */}
+        {/* ======================================================== */}
+        {activePage === "home" && (
+          <div className="space-y-12">
+            
+            {/* HERO SECTION */}
+            <section className="bg-white rounded-3xl p-8 sm:p-12 lg:p-16 border-2 border-[#ECAAB2] shadow-sm relative overflow-hidden text-center sm:text-left">
+              <div className="max-w-3xl space-y-5 relative z-10">
+                <div className="inline-flex items-center gap-2 bg-[#F8E5D7] px-3.5 py-1.5 rounded-full text-xs font-bold text-[#65232B] border border-[#ECAAB2]">
+                  <Sparkles className="w-4 h-4 text-[#65232B]" />
+                  <span>{t.heroBadge}</span>
+                </div>
+                
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#65232B] tracking-tight leading-tight">
+                  {t.heroTitle}
+                </h1>
+                
+                <p className="text-sm sm:text-base text-[#432720]/85 leading-relaxed font-medium">
+                  {t.landing.heroSubtext}
+                </p>
+
+                <div className="pt-3 flex flex-wrap items-center justify-center sm:justify-start gap-4">
+                  <button
+                    onClick={() => { setActivePage("app"); setStep(1); }}
+                    className="flex items-center gap-2.5 bg-[#65232B] text-white px-7 py-3.5 rounded-2xl font-extrabold text-sm hover:bg-[#432720] transition shadow-md"
+                  >
+                    <span>{t.landing.primaryCta}</span>
+                    <ArrowRight className="w-4 h-4 text-[#ECAAB2]" />
+                  </button>
+
+                  <button
+                    onClick={() => setActivePage("tutorial")}
+                    className="flex items-center gap-2 bg-[#F8E5D7] text-[#65232B] px-6 py-3.5 rounded-2xl font-bold text-sm border border-[#ECAAB2] hover:bg-[#ECAAB2]/30 transition shadow-xs"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    <span>{t.landing.secondaryCta}</span>
+                  </button>
+                </div>
+
+                <div className="pt-2 text-xs text-[#432720]/75 flex items-center justify-center sm:justify-start gap-2">
+                  <ShieldCheck className="w-4 h-4 text-[#65232B]" />
+                  <span>{t.trustNote}</span>
+                </div>
+              </div>
+
+              {/* Decorative Subtle Corner Glow */}
+              <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#F8E5D7]/60 pointer-events-none -z-0"></div>
+              <div className="absolute -bottom-24 -right-12 w-64 h-64 rounded-full bg-[#ECAAB2]/20 pointer-events-none -z-0"></div>
+            </section>
+
+            {/* TRUST & EXPLAINABILITY DISCLAIMER CARD */}
+            <section className="bg-[#F8E5D7]/80 rounded-3xl p-6 sm:p-8 border-2 border-[#65232B] shadow-sm flex flex-col md:flex-row items-start md:items-center gap-5">
+              <div className="w-12 h-12 rounded-2xl bg-[#65232B] text-[#ECAAB2] flex items-center justify-center flex-shrink-0 shadow-xs">
+                <Scale className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-extrabold text-sm sm:text-base text-[#65232B]">
+                  {t.landing.trustDisclaimerTitle}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed font-medium">
+                  {t.landing.trustDisclaimerText}
+                </p>
+              </div>
+            </section>
+
+            {/* THREE CORE VALUE PROPOSITION CARDS */}
+            <section className="space-y-6">
+              <div className="text-center max-w-2xl mx-auto space-y-2">
+                <h2 className="text-xl sm:text-2xl font-black text-[#65232B] tracking-tight">
+                  {t.landing.pillarsTitle}
+                </h2>
+                <p className="text-xs sm:text-sm text-[#432720]/80">
+                  {t.landing.pillarsSubtitle}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-3 hover:border-[#65232B] transition">
+                  <div className="w-10 h-10 rounded-xl bg-[#F8E5D7] text-[#65232B] flex items-center justify-center border border-[#ECAAB2]">
+                    <Search className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-extrabold text-base text-[#65232B]">{t.landing.p1Title}</h3>
+                  <p className="text-xs sm:text-sm text-[#432720]/80 leading-relaxed font-medium">
+                    {t.landing.p1Desc}
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-3 hover:border-[#65232B] transition">
+                  <div className="w-10 h-10 rounded-xl bg-[#F8E5D7] text-[#65232B] flex items-center justify-center border border-[#ECAAB2]">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-extrabold text-base text-[#65232B]">{t.landing.p2Title}</h3>
+                  <p className="text-xs sm:text-sm text-[#432720]/80 leading-relaxed font-medium">
+                    {t.landing.p2Desc}
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-3 hover:border-[#65232B] transition">
+                  <div className="w-10 h-10 rounded-xl bg-[#F8E5D7] text-[#65232B] flex items-center justify-center border border-[#ECAAB2]">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-extrabold text-base text-[#65232B]">{t.landing.p3Title}</h3>
+                  <p className="text-xs sm:text-sm text-[#432720]/80 leading-relaxed font-medium">
+                    {t.landing.p3Desc}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 4-STEP WORKFLOW PREVIEW STRIP */}
+            <section className="bg-white rounded-3xl p-8 sm:p-10 border border-[#ECAAB2] shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#ECAAB2]/40 pb-4">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-black text-[#65232B] tracking-tight">
+                    {t.landing.workflowTitle}
+                  </h2>
+                  <p className="text-xs text-[#432720]/75 mt-0.5">
+                    {t.landing.workflowSubtitle}
+                  </p>
+                </div>
+                <button
+                  onClick={() => { setActivePage("app"); setStep(1); }}
+                  className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#65232B] hover:text-[#432720] transition self-start sm:self-auto"
+                >
+                  <span>{t.navAnalyze}</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-4 rounded-2xl bg-[#F8E5D7]/40 border border-[#ECAAB2] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#65232B] font-mono">01</span>
+                    <span className="w-2 h-2 rounded-full bg-[#65232B]"></span>
+                  </div>
+                  <h4 className="font-extrabold text-sm text-[#432720]">{t.landing.step1Name}</h4>
+                  <p className="text-xs text-[#432720]/80 leading-relaxed">{t.landing.step1Desc}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#F8E5D7]/40 border border-[#ECAAB2] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#65232B] font-mono">02</span>
+                    <span className="w-2 h-2 rounded-full bg-[#65232B]"></span>
+                  </div>
+                  <h4 className="font-extrabold text-sm text-[#432720]">{t.landing.step2Name}</h4>
+                  <p className="text-xs text-[#432720]/80 leading-relaxed">{t.landing.step2Desc}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#F8E5D7]/40 border border-[#ECAAB2] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#65232B] font-mono">03</span>
+                    <span className="w-2 h-2 rounded-full bg-[#65232B]"></span>
+                  </div>
+                  <h4 className="font-extrabold text-sm text-[#432720]">{t.landing.step3Name}</h4>
+                  <p className="text-xs text-[#432720]/80 leading-relaxed">{t.landing.step3Desc}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[#F8E5D7]/40 border border-[#ECAAB2] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#65232B] font-mono">04</span>
+                    <span className="w-2 h-2 rounded-full bg-[#65232B]"></span>
+                  </div>
+                  <h4 className="font-extrabold text-sm text-[#432720]">{t.landing.step4Name}</h4>
+                  <p className="text-xs text-[#432720]/80 leading-relaxed">{t.landing.step4Desc}</p>
+                </div>
+              </div>
+            </section>
+
+            {/* CALL TO ACTION BANNER */}
+            <section className="bg-[#65232B] text-white rounded-3xl p-8 sm:p-12 text-center space-y-4 shadow-lg border border-[#ECAAB2]/40">
+              <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+                {t.landing.bannerCtaTitle}
+              </h3>
+              <p className="text-xs sm:text-sm text-[#F8E5D7]/90 max-w-xl mx-auto">
+                {t.landing.bannerCtaSubtitle}
+              </p>
+              <div className="pt-2">
+                <button
+                  onClick={() => { setActivePage("app"); setStep(1); }}
+                  className="bg-white text-[#65232B] px-8 py-3.5 rounded-2xl font-black text-sm hover:bg-[#F8E5D7] transition shadow-md"
+                >
+                  {t.landing.primaryCta}
+                </button>
+              </div>
+            </section>
+
+          </div>
+        )}
+
+        {/* PUBLIC PAGE: ABOUT */}
+        {activePage === "about" && (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#ECAAB2] shadow-sm max-w-3xl mx-auto space-y-6">
+            <button 
+              onClick={() => setActivePage("home")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#65232B] hover:text-[#432720] transition mb-2"
+            >
+              <ArrowLeft className="w-4 h-4" /> {lang === "en" ? "Back to Home" : "Kembali ke Beranda"}
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#65232B]">{t.aboutPage.heading}</h1>
+            <p className="text-base text-[#432720] leading-relaxed font-medium">{t.aboutPage.lead}</p>
+            <div className="space-y-4 text-sm text-[#432720]/90 leading-relaxed border-t border-[#ECAAB2]/40 pt-6">
+              <p>{t.aboutPage.p1}</p>
+              <p>{t.aboutPage.p2}</p>
+            </div>
+            <div className="bg-[#F8E5D7]/60 p-5 rounded-2xl border border-[#ECAAB2]/60 mt-6 space-y-2">
+              <p className="text-xs font-bold text-[#65232B] uppercase tracking-wider">{t.aboutPage.founders}</p>
+              <p className="text-sm font-semibold text-[#432720]">Kania Hansdinata & Agung Purnomo</p>
+              <p className="text-xs text-[#432720]/80 pt-1">
+                {t.aboutPage.contact} <a href="mailto:kania.hansdinata@binus.ac.id" className="text-[#65232B] font-bold underline">kania.hansdinata@binus.ac.id</a>
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* PUBLIC PAGE: TUTORIAL */}
+        {activePage === "tutorial" && (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#ECAAB2] shadow-sm max-w-3xl mx-auto space-y-6">
+            <button 
+              onClick={() => setActivePage("home")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#65232B] hover:text-[#432720] transition mb-2"
+            >
+              <ArrowLeft className="w-4 h-4" /> {lang === "en" ? "Back to Home" : "Kembali ke Beranda"}
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#65232B]">{t.tutorialPage.heading}</h1>
+            <p className="text-sm sm:text-base text-[#432720] leading-relaxed">{t.tutorialPage.lead}</p>
+            <div className="space-y-4 pt-4">
+              <div className="p-4 rounded-2xl bg-[#F8E5D7]/50 border border-[#ECAAB2]/50">
+                <h3 className="font-bold text-[#65232B] text-base mb-1">{t.tutorialPage.step1Title}</h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed">{t.tutorialPage.step1Desc}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-[#F8E5D7]/50 border border-[#ECAAB2]/50">
+                <h3 className="font-bold text-[#65232B] text-base mb-1">{t.tutorialPage.step2Title}</h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed">{t.tutorialPage.step2Desc}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-[#F8E5D7]/50 border border-[#ECAAB2]/50">
+                <h3 className="font-bold text-[#65232B] text-base mb-1">{t.tutorialPage.step3Title}</h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed">{t.tutorialPage.step3Desc}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-[#F8E5D7]/50 border border-[#ECAAB2]/50">
+                <h3 className="font-bold text-[#65232B] text-base mb-1">{t.tutorialPage.step4Title}</h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed">{t.tutorialPage.step4Desc}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => { setActivePage("app"); setStep(1); }}
+              className="mt-4 w-full bg-[#65232B] text-white py-3.5 rounded-xl font-bold text-sm hover:bg-[#432720] transition shadow"
+            >
+              {t.startMapping}
+            </button>
+          </div>
+        )}
+
+        {/* PUBLIC PAGE: PRIVACY */}
+        {activePage === "privacy" && (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#ECAAB2] shadow-sm max-w-3xl mx-auto space-y-6">
+            <button 
+              onClick={() => setActivePage("home")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#65232B] hover:text-[#432720] transition mb-2"
+            >
+              <ArrowLeft className="w-4 h-4" /> {lang === "en" ? "Back to Home" : "Kembali ke Beranda"}
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#65232B]">{t.privacyPage.heading}</h1>
+            <p className="text-sm text-[#432720] leading-relaxed">{t.privacyPage.intro}</p>
+            <div className="space-y-3 text-xs sm:text-sm text-[#432720]/90 leading-relaxed pt-2">
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.privacyPage.point1}</p>
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.privacyPage.point2}</p>
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.privacyPage.point3}</p>
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.privacyPage.point4}</p>
+            </div>
+          </div>
+        )}
+
+        {/* PUBLIC PAGE: TERMS */}
+        {activePage === "terms" && (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#ECAAB2] shadow-sm max-w-3xl mx-auto space-y-6">
+            <button 
+              onClick={() => setActivePage("home")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#65232B] hover:text-[#432720] transition mb-2"
+            >
+              <ArrowLeft className="w-4 h-4" /> {lang === "en" ? "Back to Home" : "Kembali ke Beranda"}
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#65232B]">{t.termsPage.heading}</h1>
+            <p className="text-sm text-[#432720] leading-relaxed">{t.termsPage.intro}</p>
+            <div className="space-y-3 text-xs sm:text-sm text-[#432720]/90 leading-relaxed pt-2">
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.termsPage.point1}</p>
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.termsPage.point2}</p>
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.termsPage.point3}</p>
+              <p className="p-3 bg-[#F8E5D7]/40 rounded-xl border border-[#ECAAB2]/30">{t.termsPage.point4}</p>
+            </div>
+          </div>
+        )}
+
+        {/* PUBLIC PAGE: HELP */}
+        {activePage === "help" && (
+          <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#ECAAB2] shadow-sm max-w-3xl mx-auto space-y-6">
+            <button 
+              onClick={() => setActivePage("home")}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#65232B] hover:text-[#432720] transition mb-2"
+            >
+              <ArrowLeft className="w-4 h-4" /> {lang === "en" ? "Back to Home" : "Kembali ke Beranda"}
+            </button>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#65232B]">{t.faqPage.heading}</h1>
+            <div className="space-y-4 pt-2">
+              <div className="p-4 rounded-2xl bg-[#F8E5D7]/50 border border-[#ECAAB2]/50">
+                <h3 className="font-bold text-[#65232B] text-sm mb-1">{t.faqPage.q1}</h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed">{t.faqPage.a1}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-[#F8E5D7]/50 border border-[#ECAAB2]/50">
+                <h3 className="font-bold text-[#65232B] text-sm mb-1">{t.faqPage.q2}</h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed">{t.faqPage.a2}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-[#F8E5D7]/50 border border-[#ECAAB2]/50">
+                <h3 className="font-bold text-[#65232B] text-sm mb-1">{t.faqPage.q3}</h3>
+                <p className="text-xs sm:text-sm text-[#432720]/90 leading-relaxed">{t.faqPage.a3}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIEW 1: WORKFLOW VIEW (ANALYSIS STEPPER APP)             */}
+        {/* ======================================================== */}
+        {activePage === "app" && (
+          <div className="space-y-8">
+            
+            {/* WORKFLOW TOOLBAR STRIP */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm relative overflow-hidden">
+              <div className="max-w-3xl space-y-3 relative z-10">
+                <div className="inline-flex items-center gap-2 bg-[#F8E5D7] px-3 py-1 rounded-full text-xs font-bold text-[#65232B] border border-[#ECAAB2]">
+                  <Sparkles className="w-3.5 h-3.5 text-[#65232B]" />
+                  <span>{t.evidenceBadge}</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#65232B] tracking-tight leading-tight">
+                  {t.heroTitle}
+                </h1>
+                <p className="text-xs sm:text-sm text-[#432720]/80 leading-relaxed">
+                  {t.heroSubtitle}
+                </p>
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={loadDemoCase}
+                    className="flex items-center gap-2 bg-[#F8E5D7] text-[#65232B] px-4 py-2.5 rounded-xl text-xs font-bold border border-[#ECAAB2] hover:bg-[#ECAAB2]/30 transition shadow-xs"
+                  >
+                    <Database className="w-3.5 h-3.5" />
+                    {t.loadDemo}
+                  </button>
+                  <button
+                    onClick={clearForm}
+                    className="flex items-center gap-2 bg-white text-[#432720]/70 px-4 py-2.5 rounded-xl text-xs font-semibold border border-[#ECAAB2]/50 hover:bg-[#F8E5D7]/50 transition"
+                  >
+                    {t.clearData}
+                  </button>
+                  <span className="text-[11px] text-[#432720]/70 italic sm:ml-2">
+                    {t.trustNote}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* PROGRESS STEPPER (4 STEPS) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              {[
+                { n: 1, label: t.steps.profile },
+                { n: 2, label: t.steps.competitors },
+                { n: 3, label: t.steps.evidence },
+                { n: 4, label: t.steps.dashboard }
+              ].map((s) => (
+                <button
+                  key={s.n}
+                  onClick={() => setStep(s.n)}
+                  className={`p-3.5 text-left rounded-2xl border text-xs font-bold transition flex items-center justify-between ${
+                    step === s.n
+                      ? "bg-[#65232B] text-white border-[#65232B] shadow-md ring-2 ring-[#ECAAB2]"
+                      : "bg-white text-[#432720] border-[#ECAAB2]/60 hover:bg-[#F8E5D7]/50"
+                  }`}
+                >
+                  <span>{s.label}</span>
+                  {step > s.n && <Check className="w-3.5 h-3.5 text-[#ECAAB2]" />}
+                </button>
+              ))}
+            </div>
+
+            {/* STEP 1: BUSINESS PROFILE */}
+            {step === 1 && (
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-6">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-extrabold text-[#65232B]">{t.profileSection.title}</h2>
+                  <p className="text-xs text-[#432720]/70 mt-1">{t.profileSection.subtitle}</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.nameLabel}</label>
+                    <input
+                      type="text"
+                      value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                      placeholder={lang === "en" ? "e.g., Syanata Artisan Tea" : "contoh: Syanata Artisan Tea"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.categoryLabel}</label>
+                    <input
+                      type="text"
+                      value={profile.category}
+                      onChange={(e) => setProfile({ ...profile, category: e.target.value })}
+                      placeholder={lang === "en" ? "e.g., F&B / Artisan Botanical Beverages" : "contoh: F&B / Minuman Herbal Artisan"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.offersLabel}</label>
+                    <input
+                      type="text"
+                      value={profile.offers}
+                      onChange={(e) => setProfile({ ...profile, offers: e.target.value })}
+                      placeholder={lang === "en" ? "e.g., Custom hand-blended herbal teas, artisan cold brews" : "contoh: Teh herbal lokal racikan khusus, cold brew artisan"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.targetLabel}</label>
+                    <input
+                      type="text"
+                      value={profile.targetCustomer}
+                      onChange={(e) => setProfile({ ...profile, targetCustomer: e.target.value })}
+                      placeholder={lang === "en" ? "e.g., Urban women aged 22-35 who value mindfulness & aesthetics" : "contoh: Wanita urban usia 22-35 yang peduli kesehatan & ruang santai"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.priceLabel}</label>
+                    <input
+                      type="text"
+                      value={profile.priceRange}
+                      onChange={(e) => setProfile({ ...profile, priceRange: e.target.value })}
+                      placeholder={lang === "en" ? "e.g., IDR 28,000 - IDR 55,000" : "contoh: Rp 28.000 - Rp 55.000"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.channelsLabel}</label>
+                    <input
+                      type="text"
+                      value={profile.channels}
+                      onChange={(e) => setProfile({ ...profile, channels: e.target.value })}
+                      placeholder={lang === "en" ? "e.g., Instagram, Offline Tearoom, WhatsApp Order" : "contoh: Instagram, Kedai Offline, WhatsApp Order"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.valuePropLabel}</label>
+                    <textarea
+                      rows={2}
+                      value={profile.valueProposition}
+                      onChange={(e) => setProfile({ ...profile, valueProposition: e.target.value })}
+                      placeholder={lang === "en" ? "What makes your offer truly worth choosing over alternatives?" : "Apa nilai istimewa yang membuat bisnis Anda layak dipilih pelanggan?"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-[#432720] mb-1">{t.profileSection.strategicQuestionLabel}</label>
+                    <textarea
+                      rows={2}
+                      value={profile.strategicQuestion}
+                      onChange={(e) => setProfile({ ...profile, strategicQuestion: e.target.value })}
+                      placeholder={lang === "en" ? "e.g., How to position without price cuts against commercial chains?" : "contoh: Bagaimana cara diferensiasi tanpa perang harga melawan kedai besar?"}
+                      className="w-full text-xs sm:text-sm p-3 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B] bg-[#F8E5D7]/10"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4 border-t border-[#ECAAB2]/40">
+                  <button
+                    onClick={() => setStep(2)}
+                    className="flex items-center gap-2 bg-[#65232B] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#432720] transition shadow-xs"
+                  >
+                    <span>{t.profileSection.nextBtn}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: COMPETITORS SELECTION */}
+            {step === 2 && (
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-extrabold text-[#65232B]">{t.competitorSection.title}</h2>
+                    <p className="text-xs text-[#432720]/70 mt-1">{t.competitorSection.subtitle}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowAddCompModal(true)}
+                    className="inline-flex items-center gap-1.5 bg-[#F8E5D7] text-[#65232B] px-3.5 py-2 rounded-xl text-xs font-bold border border-[#ECAAB2] hover:bg-[#ECAAB2]/40 transition self-start sm:self-auto"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>{t.competitorSection.addCompetitorBtn}</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {competitors.map((comp) => (
+                    <div
+                      key={comp.id}
+                      className={`p-4 rounded-2xl border transition flex items-start justify-between gap-4 ${
+                        comp.confirmed 
+                          ? "bg-[#F8E5D7]/40 border-[#65232B]" 
+                          : "bg-white border-[#ECAAB2]/50 opacity-60"
+                      }`}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-extrabold text-[#65232B] text-sm sm:text-base">{comp.name}</span>
+                          <span className="text-[10px] bg-[#65232B] text-white px-2 py-0.5 rounded-full font-bold">
+                            {comp.id}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#432720]">
+                          <span className="font-bold">{t.competitorSection.categoryText}:</span> {comp.category} • <span className="font-bold">{t.competitorSection.priceText}:</span> {comp.priceRange}
+                        </p>
+                        <p className="text-xs text-[#65232B] font-semibold italic">
+                          "{t.competitorSection.relevanceText}: {comp.relevanceReason}"
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setCompetitors(competitors.map(c => c.id === comp.id ? { ...c, confirmed: !c.confirmed } : c));
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition ${
+                            comp.confirmed
+                              ? "bg-[#65232B] text-white border-[#65232B]"
+                              : "bg-white text-[#432720] border-[#ECAAB2]"
+                          }`}
+                        >
+                          {comp.confirmed ? (lang === "en" ? "Active" : "Aktif") : (lang === "en" ? "Include" : "Sertakan")}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-between items-center pt-4 border-t border-[#ECAAB2]/40">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="text-xs font-bold text-[#432720] hover:text-[#65232B] underline"
+                  >
+                    {t.competitorSection.backBtn}
+                  </button>
+                  <button
+                    onClick={() => setStep(3)}
+                    disabled={!competitors.some(c => c.confirmed)}
+                    className="flex items-center gap-2 bg-[#65232B] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#432720] transition shadow-xs disabled:opacity-40"
+                  >
+                    <span>{t.competitorSection.nextBtn}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: EVIDENCE LOGS */}
+            {step === 3 && (
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-extrabold text-[#65232B]">{t.evidenceSection.title}</h2>
+                    <p className="text-xs text-[#432720]/70 mt-1">{t.evidenceSection.subtitle}</p>
+                  </div>
+                  <button
+                    onClick={() => setShowAddEvidenceModal(true)}
+                    className="inline-flex items-center gap-1.5 bg-[#F8E5D7] text-[#65232B] px-3.5 py-2 rounded-xl text-xs font-bold border border-[#ECAAB2] hover:bg-[#ECAAB2]/40 transition self-start sm:self-auto"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>{t.evidenceSection.addEvidenceBtn}</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {evidences.map((ev) => (
+                    <div key={ev.id} className="p-4 rounded-2xl bg-[#F8E5D7]/30 border border-[#ECAAB2] space-y-2">
+                      <div className="flex flex-wrap items-center justify-between text-xs gap-2">
+                        <div className="flex items-center gap-2 font-bold text-[#65232B]">
+                          <span className="bg-[#65232B] text-white px-2 py-0.5 rounded-full text-[10px]">{ev.id}</span>
+                          <span>{ev.platform}</span>
+                          <span className="text-[#432720]/60 font-medium">({ev.dimension})</span>
+                          <span className="text-[10px] bg-white text-[#432720] px-2 py-0.5 rounded border border-[#ECAAB2]">
+                            Subjek: {ev.competitorId}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-[#432720]/80">
+                          {ev.capturedAt} • <span className="font-semibold text-emerald-800">{ev.verificationStatus}</span>
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-[#432720] bg-white p-3 rounded-xl border border-[#ECAAB2]/40 font-medium leading-relaxed">
+                        "{ev.rawExcerpt}"
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-between items-center pt-4 border-t border-[#ECAAB2]/40">
+                  <button
+                    onClick={() => setStep(2)}
+                    className="text-xs font-bold text-[#432720] hover:text-[#65232B] underline"
+                  >
+                    {t.evidenceSection.backBtn}
+                  </button>
+                  <button
+                    onClick={handleRunAnalysis}
+                    disabled={isAnalyzing}
+                    className="flex items-center gap-2 bg-[#65232B] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#432720] transition shadow-xs disabled:opacity-50"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>{t.evidenceSection.analyzingText}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-[#ECAAB2]" />
+                        <span>{t.evidenceSection.runAnalysisBtn}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 4: DASHBOARD, 2D MAP & REAL PDF DOWNLOAD */}
+            {step === 4 && analysisResult && (
+              <div className="space-y-6">
+                
+                {/* SUMMARY CARD */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg sm:text-xl font-extrabold text-[#65232B] flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-[#65232B]" />
+                      {t.dashboardSection.summaryTitle}
+                    </h2>
+                    <span className="text-xs font-bold bg-[#65232B] text-white px-3 py-1 rounded-full">
+                      {t.dashboardSection.confidenceText}: {analysisResult.overallConfidence}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#432720] bg-[#F8E5D7]/40 p-4 rounded-2xl border border-[#ECAAB2]/50 leading-relaxed font-medium">
+                    {analysisResult.summary}
+                  </p>
+                </div>
+
+                {/* 2D STRATEGIC QUADRANT MAP */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h3 className="font-extrabold text-[#65232B] text-base sm:text-lg">{t.dashboardSection.quadrantTitle}</h3>
+                      <p className="text-xs text-[#432720]/70">{t.dashboardSection.quadrantSubtitle}</p>
+                    </div>
+                  </div>
+
+                  {/* 2D CANVAS CONTAINER */}
+                  <div className="relative w-full aspect-square max-w-[480px] mx-auto bg-[#F8E5D7]/50 rounded-2xl border border-[#ECAAB2] p-8 flex items-center justify-center shadow-inner">
+                    <div className="absolute w-full h-[1.5px] bg-[#432720]/30 left-0" />
+                    <div className="absolute h-full w-[1.5px] bg-[#432720]/30 top-0" />
+
+                    <div className="absolute top-2 text-[11px] font-bold text-[#65232B] text-center w-full px-4">
+                      ▲ {analysisResult.quadrant.yAxisLabel.split(" vs. ")[1] || analysisResult.quadrant.yAxisLabel}
+                    </div>
+                    <div className="absolute bottom-2 text-[11px] font-bold text-[#432720]/80 text-center w-full px-4">
+                      ▼ {analysisResult.quadrant.yAxisLabel.split(" vs. ")[0] || analysisResult.quadrant.yAxisLabel}
+                    </div>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#65232B] text-right max-w-[120px] leading-tight">
+                      ► {analysisResult.quadrant.xAxisLabel.split(" vs. ")[1] || analysisResult.quadrant.xAxisLabel}
+                    </div>
+                    <div className="absolute left-2 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#432720]/80 text-left max-w-[120px] leading-tight">
+                      ◄ {analysisResult.quadrant.xAxisLabel.split(" vs. ")[0] || analysisResult.quadrant.xAxisLabel}
+                    </div>
+
+                    {analysisResult.quadrant.points.map((pt, idx) => {
+                      const leftPercent = 50 + (pt.x / 10) * 38;
+                      const topPercent = 50 - (pt.y / 10) * 38;
+
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => openEvidenceDrawerWithRef(pt.ref.split(",")[0])}
+                          className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center cursor-pointer group z-10"
+                          style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}
+                        >
+                          <div 
+                            className={`w-5 h-5 rounded-full border-2 transition-transform group-hover:scale-125 shadow-md flex items-center justify-center ${
+                              pt.isUser 
+                                ? "bg-[#65232B] border-white ring-4 ring-[#ECAAB2]" 
+                                : "bg-[#432720] border-white"
+                            }`}
+                          >
+                            <span className="text-[8px] text-white font-bold">{pt.isUser ? "YOU" : "VS"}</span>
+                          </div>
+                          <span className={`text-[10px] font-extrabold mt-1 px-2 py-0.5 rounded-full whitespace-nowrap shadow-xs border ${
+                            pt.isUser 
+                              ? "bg-[#65232B] text-white border-[#65232B]" 
+                              : "bg-white text-[#432720] border-[#ECAAB2]"
+                          }`}>
+                            {pt.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-center gap-6 pt-2 text-xs font-semibold text-[#432720]">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 rounded-full bg-[#65232B] ring-2 ring-[#ECAAB2]" />
+                      <span>{t.dashboardSection.userBrandBadge}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3.5 h-3.5 rounded-full bg-[#432720]" />
+                      <span>{t.dashboardSection.competitorBadge}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CUSTOMER VOICE SIGNALS */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-4">
+                  <div>
+                    <h3 className="font-extrabold text-[#65232B] text-base sm:text-lg">{t.dashboardSection.customerSignalsTitle}</h3>
+                    <p className="text-xs text-[#432720]/70">{t.dashboardSection.customerSignalsSubtitle}</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {analysisResult.customerSignals.map((sig, idx) => (
+                      <div key={idx} className="p-4 rounded-2xl bg-[#F8E5D7]/30 border border-[#ECAAB2] flex flex-col justify-between space-y-3">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-wider bg-[#65232B] text-white px-2 py-0.5 rounded-full">
+                              {sig.type}
+                            </span>
+                            <div className="flex gap-1">
+                              {sig.evidenceRefs.map(ref => (
+                                <button
+                                  key={ref}
+                                  onClick={() => openEvidenceDrawerWithRef(ref)}
+                                  className="text-[10px] bg-white text-[#65232B] font-bold px-1.5 py-0.5 rounded border border-[#ECAAB2] hover:bg-[#ECAAB2]/30"
+                                >
+                                  {ref}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <h4 className="font-bold text-xs sm:text-sm text-[#432720] leading-snug">{sig.theme}</h4>
+                          <p className="text-xs text-[#432720]/80 leading-relaxed">{sig.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ACTIONABLE DIFFERENTIATION OPTIONS */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECAAB2] shadow-sm space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h3 className="font-extrabold text-[#65232B] text-base sm:text-lg">{t.dashboardSection.optionsTitle}</h3>
+                      <p className="text-xs text-[#432720]/70">{t.dashboardSection.optionsSubtitle}</p>
+                    </div>
+                    <span className="text-xs bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 rounded-full font-bold self-start sm:self-auto">
+                      {t.dashboardSection.decisionRequiredBadge}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {analysisResult.strategyOptions.map((opt) => {
+                      const isAdopted = adoptedOptions.includes(opt.id);
+                      return (
+                        <div
+                          key={opt.id}
+                          className={`p-4 sm:p-5 rounded-2xl border transition space-y-3 ${
+                            isAdopted 
+                              ? "bg-[#F8E5D7]/50 border-[#65232B] ring-1 ring-[#65232B]" 
+                              : "bg-white border-[#ECAAB2]"
+                          }`}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="space-y-1">
+                              <h4 className="font-extrabold text-sm sm:text-base text-[#65232B]">{opt.title}</h4>
+                              <p className="text-xs sm:text-sm text-[#432720] leading-relaxed">{opt.description}</p>
+                              <p className="text-xs text-[#432720]/70 italic">
+                                <span className="font-bold">{lang === "en" ? "Rationale:" : "Alasan:"}</span> {opt.rationale}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 self-end sm:self-auto">
+                              <button
+                                onClick={() => toggleAdoptOption(opt.id)}
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                                  isAdopted
+                                    ? "bg-emerald-700 text-white shadow-xs"
+                                    : "bg-[#65232B] text-white hover:bg-[#432720]"
+                                }`}
+                              >
+                                {isAdopted && <Check className="w-3.5 h-3.5" />}
+                                <span>{isAdopted ? t.dashboardSection.appliedActionBtn : t.dashboardSection.applyActionBtn}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="pt-2 border-t border-[#ECAAB2]/30 flex items-center gap-2">
+                            <span className="text-[11px] font-semibold text-[#432720]/70">
+                              {lang === "en" ? "Supporting Evidence:" : "Bukti Pendukung:"}
+                            </span>
+                            {opt.evidenceRefs.map(ref => (
+                              <button
+                                key={ref}
+                                onClick={() => openEvidenceDrawerWithRef(ref)}
+                                className="text-[10px] bg-[#F8E5D7] text-[#65232B] font-bold px-2 py-0.5 rounded-full border border-[#ECAAB2] hover:bg-[#ECAAB2]/40"
+                              >
+                                {ref}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* DATA GAPS */}
+                <div className="p-5 rounded-2xl bg-[#F8E5D7]/40 border border-[#ECAAB2] space-y-2">
+                  <h4 className="font-bold text-xs sm:text-sm text-[#65232B] flex items-center gap-2">
+                    <Info className="w-4 h-4 text-[#65232B]" />
+                    {t.dashboardSection.dataGapsTitle}
+                  </h4>
+                  <ul className="list-disc list-inside space-y-1 text-xs text-[#432720]/80">
+                    {analysisResult.dataGaps.map((gap, i) => (
+                      <li key={i}>{gap}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* PDF DOWNLOAD SECTION */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#65232B] shadow-md space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <h3 className="font-extrabold text-[#65232B] text-base sm:text-lg flex items-center gap-2">
+                        <Download className="w-5 h-5 text-[#65232B]" />
+                        {t.dashboardSection.downloadTitle}
+                      </h3>
+                      <p className="text-xs text-[#432720]/80 mt-1 max-w-xl">
+                        {t.dashboardSection.downloadDesc}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        onClick={handleDownloadPdfReport}
+                        disabled={isGeneratingPdf}
+                        className="inline-flex items-center gap-2 bg-[#65232B] text-white px-5 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-[#432720] transition shadow-md disabled:opacity-50"
+                      >
+                        {isGeneratingPdf ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <span>{t.dashboardSection.generatingPdf}</span>
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="w-4 h-4 text-[#ECAAB2]" />
+                            <span>{t.dashboardSection.btnPdf}</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => window.print()}
+                        className="inline-flex items-center gap-1.5 bg-[#F8E5D7] text-[#432720] px-4 py-3 rounded-xl font-bold text-xs border border-[#ECAAB2] hover:bg-[#ECAAB2]/30 transition"
+                      >
+                        <Printer className="w-4 h-4 text-[#65232B]" />
+                        <span>{t.dashboardSection.btnPrint}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center pt-2">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="text-xs font-bold text-[#65232B] hover:text-[#432720] underline"
+                  >
+                    {t.dashboardSection.restartBtn}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* ======================================================== */}
+      {/* MODAL: ADD COMPETITOR DIALOG                             */}
+      {/* ======================================================== */}
+      {showAddCompModal && (
+        <div className="fixed inset-0 z-50 bg-[#432720]/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 border border-[#ECAAB2] shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-[#ECAAB2]/40">
+              <h3 className="font-extrabold text-[#65232B] text-base">{t.competitorSection.modalTitle}</h3>
+              <button onClick={() => setShowAddCompModal(false)} className="text-[#432720]/60 hover:text-[#65232B]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">Nama Kompetitor *</label>
+                <input
+                  type="text"
+                  value={newComp.name}
+                  onChange={(e) => setNewComp({ ...newComp, name: e.target.value })}
+                  placeholder={t.competitorSection.namePlaceholder}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">Kategori Usaha</label>
+                <input
+                  type="text"
+                  value={newComp.category}
+                  onChange={(e) => setNewComp({ ...newComp, category: e.target.value })}
+                  placeholder={t.competitorSection.categoryPlaceholder}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">Estimasi Rentang Harga</label>
+                <input
+                  type="text"
+                  value={newComp.priceRange}
+                  onChange={(e) => setNewComp({ ...newComp, priceRange: e.target.value })}
+                  placeholder={t.competitorSection.pricePlaceholder}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">Alasan Relevansi *</label>
+                <textarea
+                  rows={2}
+                  value={newComp.relevanceReason}
+                  onChange={(e) => setNewComp({ ...newComp, relevanceReason: e.target.value })}
+                  placeholder={t.competitorSection.reasonPlaceholder}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setShowAddCompModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#432720] border border-[#ECAAB2]"
+              >
+                {t.competitorSection.cancelBtn}
+              </button>
+              <button
+                onClick={handleSaveCompetitor}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#65232B] text-white hover:bg-[#432720]"
+              >
+                {t.competitorSection.saveBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL: ADD EVIDENCE DIALOG                               */}
+      {/* ======================================================== */}
+      {showAddEvidenceModal && (
+        <div className="fixed inset-0 z-50 bg-[#432720]/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 border border-[#ECAAB2] shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-[#ECAAB2]/40">
+              <h3 className="font-extrabold text-[#65232B] text-base">{t.evidenceSection.modalTitle}</h3>
+              <button onClick={() => setShowAddEvidenceModal(false)} className="text-[#432720]/60 hover:text-[#65232B]">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">{t.evidenceSection.competitorTarget}</label>
+                <select
+                  value={newEvidence.competitorId}
+                  onChange={(e) => setNewEvidence({ ...newEvidence, competitorId: e.target.value })}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                >
+                  {competitors.map(c => (
+                    <option key={c.id} value={c.id}>{c.name} ({c.id})</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">{t.evidenceSection.dimensionSelect}</label>
+                <select
+                  value={newEvidence.dimension}
+                  onChange={(e) => setNewEvidence({ ...newEvidence, dimension: e.target.value })}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                >
+                  <option value="product">Produk / Layanan</option>
+                  <option value="price">Harga & Promosi</option>
+                  <option value="customer_feedback">Ulasan Pelanggan</option>
+                  <option value="service">Layanan & Suasana</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">Platform / Sumber Bukti</label>
+                <input
+                  type="text"
+                  value={newEvidence.platform}
+                  onChange={(e) => setNewEvidence({ ...newEvidence, platform: e.target.value })}
+                  placeholder={t.evidenceSection.sourcePlaceholder}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#432720] mb-1">Kutipan Fakta Teramati *</label>
+                <textarea
+                  rows={3}
+                  value={newEvidence.rawExcerpt}
+                  onChange={(e) => setNewEvidence({ ...newEvidence, rawExcerpt: e.target.value })}
+                  placeholder={t.evidenceSection.excerptPlaceholder}
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#ECAAB2] focus:outline-none focus:ring-2 focus:ring-[#65232B]"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setShowAddEvidenceModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#432720] border border-[#ECAAB2]"
+              >
+                {t.competitorSection.cancelBtn}
+              </button>
+              <button
+                onClick={handleSaveEvidence}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#65232B] text-white hover:bg-[#432720]"
+              >
+                {t.evidenceSection.saveEvidenceBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* EVIDENCE INSPECTOR DRAWER                                */}
+      {/* ======================================================== */}
+      {selectedEvidenceForDrawer && (
+        <div className="fixed inset-0 z-50 bg-[#432720]/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-[#ECAAB2] shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#ECAAB2]/40">
+              <div className="flex items-center gap-2">
+                <span className="bg-[#65232B] text-white px-2.5 py-1 rounded-full text-xs font-extrabold">
+                  {selectedEvidenceForDrawer.id}
+                </span>
+                <h3 className="font-extrabold text-[#65232B] text-base">{t.evidenceDrawer.title}</h3>
+              </div>
+              <button
+                onClick={() => setSelectedEvidenceForDrawer(null)}
+                className="text-[#432720]/60 hover:text-[#65232B] p-1 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <span className="text-[11px] font-bold text-[#432720]/70 uppercase tracking-wider block mb-1">
+                  {t.evidenceDrawer.excerptTitle}
+                </span>
+                <p className="text-xs sm:text-sm text-[#432720] bg-[#F8E5D7]/50 p-4 rounded-2xl border border-[#ECAAB2]/60 font-medium leading-relaxed">
+                  "{selectedEvidenceForDrawer.rawExcerpt}"
+                </p>
+              </div>
+
+              <div>
+                <span className="text-[11px] font-bold text-[#432720]/70 uppercase tracking-wider block mb-1">
+                  {t.evidenceDrawer.provenanceTitle}
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs bg-[#F8E5D7]/20 p-3 rounded-xl border border-[#ECAAB2]/30">
+                  <div>
+                    <span className="font-semibold text-[#432720]/70">{t.evidenceDrawer.channelLabel}</span>
+                    <p className="font-bold text-[#432720]">{selectedEvidenceForDrawer.platform}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#432720]/70">{t.evidenceDrawer.dateLabel}</span>
+                    <p className="font-bold text-[#432720]">{selectedEvidenceForDrawer.capturedAt}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#432720]/70">{t.evidenceDrawer.verificationLabel}</span>
+                    <p className="font-bold text-emerald-800">{selectedEvidenceForDrawer.verificationStatus}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#432720]/70">{t.evidenceDrawer.confidenceLabel}</span>
+                    <p className="font-bold text-[#65232B] uppercase">{selectedEvidenceForDrawer.confidence || "High"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setSelectedEvidenceForDrawer(null)}
+                className="bg-[#65232B] text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-[#432720] transition"
+              >
+                {t.evidenceDrawer.closeBtn}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* GLOBAL FOOTER                                            */}
+      {/* ======================================================== */}
+      <footer className="bg-[#432720] text-[#F8E5D7] mt-16 border-t border-[#65232B]">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="md:col-span-2 space-y-2">
+              <div className="flex items-center gap-2">
+                <Compass className="w-5 h-5 text-[#ECAAB2]" />
+                <h3 className="font-extrabold text-white text-base">{t.appTitle}</h3>
+              </div>
+              <p className="text-xs text-[#F8E5D7]/80 leading-relaxed max-w-md">
+                {t.footer.brandDesc}
+              </p>
+              <div className="pt-2 text-xs text-[#ECAAB2] space-y-0.5">
+                <p><span className="font-bold">{t.footer.teamTitle}:</span> {t.footer.teamMembers}</p>
+                <p>{t.footer.contactEmail}</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-3">{t.footer.navTitle}</h4>
+              <ul className="space-y-2 text-xs text-[#F8E5D7]/80">
+                <li><button onClick={() => setActivePage("home")} className="hover:text-[#ECAAB2] transition">{t.navHome}</button></li>
+                <li><button onClick={() => { setActivePage("app"); setStep(1); }} className="hover:text-[#ECAAB2] transition">{t.navAnalyze}</button></li>
+                <li><button onClick={() => setActivePage("tutorial")} className="hover:text-[#ECAAB2] transition">{t.navTutorial}</button></li>
+                <li><button onClick={() => setActivePage("about")} className="hover:text-[#ECAAB2] transition">{t.navAbout}</button></li>
+                <li><button onClick={() => setActivePage("help")} className="hover:text-[#ECAAB2] transition">{t.navHelp}</button></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-3">{t.footer.legalTitle}</h4>
+              <ul className="space-y-2 text-xs text-[#F8E5D7]/80">
+                <li><button onClick={() => setActivePage("privacy")} className="hover:text-[#ECAAB2] transition">{t.footer.privacyPolicy}</button></li>
+                <li><button onClick={() => setActivePage("terms")} className="hover:text-[#ECAAB2] transition">{t.footer.termsOfUse}</button></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-white/10 text-center text-[11px] text-[#F8E5D7]/60">
+            {t.footer.copyright}
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
